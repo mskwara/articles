@@ -1,17 +1,53 @@
 <template>
   <div id="articleMain">
     <div class="media">
-      <img src="./assets/avatar.jpg" class="mr-3 avatar">
-      <div class="media-body">
-        <div class="header">
-          <h2 class="mt-0">{{article.title}}</h2>
-          <h6>{{article.date}}</h6>
-        </div>
-        <p>{{article.content}}</p>
-        <div class="bottom">
-          <button type="button" class="btn btn-primary like"><img class="likeIcon" src="./assets/likeWhite.svg" />Like</button>
+      <div class="container">
+        <img src="./assets/avatar.jpg" class="mr-3 avatar">
+        <div class="media-body">
+
+          <div class="header">
+            <h2 class="mt-0">{{article.title}}</h2>
+            <h6>{{article.date}}</h6>
+          </div>
+          <p>{{article.content}}</p>
+          <div class="bottom">
+            <button type="button" class="btn btn-primary like" @click="like()"><img class="likeIcon" src="./assets/likeWhite.svg" />Like</button>
+          </div>
         </div>
       </div>
+      <h4>Comments</h4>
+      <div class="commentSection">
+        <div class="comments" v-if="comments != null">
+
+          <ul class="list-group">
+            <li class="list-group-item" :key="comment.id" v-for="comment in comments">
+              <img src="./assets/avatar.jpg" class="mr-3 commentAvatar">
+              <div class="comContent">
+                <h6>
+                  <a class="username">Michał Skwara</a>
+                  {{comment.content}}
+                </h6>
+                <div class="likeIconComments">
+                  <img src="./assets/like.svg" />
+                  <md-tooltip md-direction="right">{{comment.likes}} likes</md-tooltip>
+                </div>
+              </div>
+
+            </li>
+          </ul>
+        </div>
+
+
+        <div class="createComment">
+          <div class="input-group mb-3">
+            <textarea class="form-control" rows="2" placeholder="Write a comment..." aria-describedby="button-addon2" v-model="newComment.content" />
+            <div class="input-group-append">
+              <button class="btn btn-primary" type="button" id="button-addon2" @click="addComment()">Send</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 </template>
@@ -25,41 +61,87 @@ export default {
   data(){
     return {
       article: {},
+      comments: [],
+      newComment: {
+        articleId: 0,
+        content: "",
+        userId: 0,
+      },
+      getCommentsInterval: null,
+    }
+  },
+  methods: {
+    addComment(){
+      this.newComment.articleId = this.$route.params.id;
+      //this.newComment.userId = ;
+      this.$http.post('comments/add', this.newComment);
+      this.newComment.content = "";
+      this.getComments();
+      this.$http.put('articles/'+this.$route.params.id+'/commentsNumber');
+    },
+    getComments(){
+      this.$http.get('articles/'+this.$route.params.id+'/comments').then(response => {
+        this.comments = response.body;
+      });
+    },
+    like(){
+      this.$http.put('articles/'+this.$route.params.id+'/likes');
     }
   },
   mounted(){
     this.$http.get('articles/'+this.$route.params.id).then(response => {
       this.article = response.body[0];
     });
+    this.getComments();
+    this.getCommentsInterval = setInterval(this.getComments, 5000);
+  },
+  destroyed(){
+    clearInterval(this.getCommentsInterval);
   }
 }
 </script>
 
 <style scoped>
-#articles {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
 .media {
   border: 1px solid gray;
   border-radius: 5px;
   padding: 20px;
+  display: flex;
+  flex-direction: column;
+}
+.container {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
 }
 h2 {
   text-align: left;
 }
+h4 {
+  text-align: left;
+}
 h6 {
   font-size: 10pt;
+  margin-right: 30px;
 }
 .avatar {
   border-radius: 200px;
   width: 200px;
 }
+.commentAvatar {
+  border-radius: 30px;
+  width: 30px;
+  float: left;
+  margin-bottom: 10px;
+}
+.username {
+  color: #007bff !important;
+  font-weight: bold;
+  margin-right: 10px;
+  cursor: pointer;
+}
 p {
-  margin-left: 40px;
+  margin-left: 20px;
 }
 .header {
   display: flex;
@@ -78,11 +160,36 @@ button {
   height: 20px !important;
   margin-right: 5px;
 }
-.comment {
-  width: 30px;
-  margin-right: 20px;
-  padding: 5px;
-  margin-left: 5px;
+.likeIconComments {
+  width: 20px !important;
+  min-width: 20px !important;
+  height: 20px !important;
+  min-height: 20px !important;
+  margin-right: 5px;
+  float: right;
+}
+.comContent {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+.comments {
+  width: 50%;
+  float: left;
+}
+.createComment {
+  width: 40%;
+  float: right;
+}
+.commentSection {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+  width: 100%;
+}
+.date {
+  font-size: 6pt;
 }
 .bottom {
   display: flex;

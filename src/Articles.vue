@@ -16,14 +16,24 @@ export default {
   },
   data(){
     return {
-      articles: {}
+      articles: {},
+      getArticlesInterval: null,
     }
   },
-  mounted(){
-    this.$http.get('articles').then(response => {
-      this.articles = response.body;
-    });
+  methods: {
+    getArticles(){
+      this.$http.get('articles').then(response => {
+        this.articles = response.body;
+      });
+    },
   },
+  mounted(){
+    this.getArticles();
+    this.getArticlesInterval = setInterval(this.getArticles, 10000);
+  },
+  destroyed(){
+    clearInterval(this.getArticlesInterval);
+  }
 }
 </script>
 

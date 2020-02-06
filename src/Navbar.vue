@@ -1,12 +1,12 @@
 <template>
 <div id="navbar">
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top shadow-sm">
-    <a class="navbar-brand" href="#">Articles</a>
+    <router-link class="navbar-brand" to="/">Articles</router-link>
 
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav mr-auto">
         <li class="nav-item active">
-          <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+          <router-link class="nav-link" to="/">Home <span class="sr-only">(current)</span></router-link>
         </li>
         <li class="nav-item">
           <a class="nav-link" href="#">My articles</a>
