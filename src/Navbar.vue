@@ -12,18 +12,21 @@
           <a class="nav-link" href="#">My articles</a>
         </li>
         <li class="nav-item">
-
           <a class="nav-link" href="#"><img class="avatar" src="./assets/avatar.jpg" />Michał</a>
         </li>
+        <li class="nav-item">
+          <button class="btn btn-outline-success write" @click="setRoute('/writing')">Write an article</button>
+        </li>
       </ul>
+
       <form class="form-inline my-2 my-lg-0">
         <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-          <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-        </form>
-      </div>
-    </nav>
+        <button class="btn btn-outline-warning my-2 my-sm-0" type="submit">Search</button>
+      </form>
+    </div>
+  </nav>
 
-  </div>
+</div>
 </template>
 
 <script>
@@ -32,6 +35,11 @@ export default {
   name: 'navbar',
   components: {
 
+  },
+  methods: {
+    setRoute(link){
+      this.$router.push(link);
+    },
   }
 }
 </script>
@@ -58,13 +66,11 @@ align-items: center;
 display: flex !important;
 align-items: center;
 }
-.leftPanel {
-  width: 300px;
-  height: 100vh;
-  border-right: 1px solid gray;
-  background-color: #fafafa;
-}
 .header {
   padding-top: 10px;
+}
+.write {
+  margin-left: 100px;
+  width: 200px;
 }
 </style>

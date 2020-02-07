@@ -1,8 +1,17 @@
 <template>
   <div id="articles">
-    <div class="article" :key="article.id" v-for="article in articles">
-      <article-short :article="article"></article-short>
+    <div class="spinner-border text-primary" role="status" v-if="loading">
+      <span class="sr-only">Loading...</span>
     </div>
+    <div v-if="articles.length > 0">
+      <div class="article" :key="article.id" v-for="article in articles">
+        <article-short :article="article"></article-short>
+      </div>
+    </div>
+    <div v-if="articles.length == 0 && !loading">
+      Nikt nie napisał jeszcze żadnego artykułu.
+    </div>
+
   </div>
 </template>
 
@@ -16,14 +25,16 @@ export default {
   },
   data(){
     return {
-      articles: {},
+      articles: [],
       getArticlesInterval: null,
+      loading: true,
     }
   },
   methods: {
     getArticles(){
       this.$http.get('articles').then(response => {
         this.articles = response.body;
+        this.loading = false;
       });
     },
   },

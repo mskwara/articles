@@ -1,6 +1,9 @@
 <template>
   <div id="articleMain">
-    <div class="media">
+    <div class="spinner-border text-primary" role="status" v-if="loading">
+      <span class="sr-only">Loading...</span>
+    </div>
+    <div class="media" v-if="!loading">
       <div class="container">
         <img src="./assets/avatar.jpg" class="mr-3 avatar">
         <div class="media-body">
@@ -28,13 +31,16 @@
                   {{comment.content}}
                 </h6>
                 <div class="likeIconComments">
-                  <img src="./assets/like.svg" />
+                  <img src="./assets/like.svg" @click="likeComment(comment)" />
                   <md-tooltip md-direction="right">{{comment.likes}} likes</md-tooltip>
                 </div>
               </div>
 
             </li>
           </ul>
+          <div class="spinner-grow text-primary" role="status" v-if="loadingNewComment">
+            <span class="sr-only">Loading...</span>
+          </div>
         </div>
 
 
@@ -68,10 +74,13 @@ export default {
         userId: 0,
       },
       getCommentsInterval: null,
+      loading: true,
+      loadingNewComment: false,
     }
   },
   methods: {
     addComment(){
+      this.loadingNewComment = true;
       this.newComment.articleId = this.$route.params.id;
       //this.newComment.userId = ;
       this.$http.post('comments/add', this.newComment);
@@ -82,10 +91,16 @@ export default {
     getComments(){
       this.$http.get('articles/'+this.$route.params.id+'/comments').then(response => {
         this.comments = response.body;
+        this.loading = false;
+        this.loadingNewComment = false;
       });
     },
     like(){
       this.$http.put('articles/'+this.$route.params.id+'/likes');
+    },
+    likeComment(comment){
+      this.$http.put('comments/'+comment.id+'/likes');
+      this.getComments();
     }
   },
   mounted(){
@@ -142,6 +157,7 @@ h6 {
 }
 p {
   margin-left: 20px;
+  white-space: pre-line;
 }
 .header {
   display: flex;

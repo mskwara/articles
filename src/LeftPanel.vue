@@ -7,23 +7,8 @@
         <li class="nav-item">
           <a class="nav-link active" href="#">All</a>
         </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#">Animals</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#">Books</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#">Sport</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#">Hobby</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#">Politics</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#">Others</a>
+        <li class="nav-item" :key="cat.key" v-for="cat in categories">
+          <a class="nav-link active" href="#">{{cat.label}}</a>
         </li>
       </ul>
     </div>
@@ -31,11 +16,17 @@
 </template>
 
 <script>
+import categories from "./categories.js";
 
 export default {
   name: 'navbar',
   components: {
 
+  },
+  data(){
+    return {
+      categories: categories.categories,
+    }
   }
 }
 </script>

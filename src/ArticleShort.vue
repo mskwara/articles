@@ -64,6 +64,7 @@ h6 {
 .avatar {
   border-radius: 200px;
   width: 200px;
+  min-width: 50px;
 }
 p {
   margin-left: 40px;
