@@ -1,25 +1,40 @@
 <template>
   <div id="app">
-    <navbar></navbar>
-    <div class="page">
-      <div class="left">
-        <left-panel></left-panel>
-      </div>
-      <div class="right">
-        <router-view></router-view>
-      </div>
-    </div>
+    <router-view @authenticated="setAuthenticated" />
   </div>
 </template>
 
 <script>
-import Navbar from './Navbar.vue'
-import LeftPanel from './LeftPanel.vue'
+import service from "./service.js";
 
 export default {
   name: 'app',
   components: {
-    Navbar, LeftPanel
+  },
+  data(){
+    return {
+      authenticated: false,
+      mockAccount: {
+          email: "a@b.c",
+          password: "pass"
+      }
+    }
+  },
+  mounted(){
+    if(!service.authenticated) {
+        this.$router.replace({ name: "login" });
+    }
+    else {
+      this.$router.replace({ name: "home" });
+    }
+  },
+  methods: {
+      setAuthenticated(status) {
+          service.authenticated = status;
+      },
+      logout() {
+          this.authenticated = false;
+      }
   }
 }
 </script>
@@ -36,17 +51,5 @@ body {
   color: #2c3e50;
   margin-top: 0;
 }
-.page {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: nowrap;
-  margin-top: 60px;
-}
-.left {
-  width: 300px;
-}
-.right {
-  padding: 50px;
-  flex: 1;
-}
+
 </style>

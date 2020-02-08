@@ -6,19 +6,19 @@
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav mr-auto">
         <li class="nav-item active">
-          <router-link class="nav-link" to="/">Home <span class="sr-only">(current)</span></router-link>
+          <router-link class="nav-link" to="/articles">Home <span class="sr-only">(current)</span></router-link>
         </li>
         <li class="nav-item">
           <a class="nav-link" href="#">My articles</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="#"><img class="avatar" src="./assets/avatar.jpg" />Michał</a>
+          <a class="nav-link" href="#"><img class="avatar" src="./assets/avatar.jpg" />{{getName()}}</a>
         </li>
         <li class="nav-item">
           <button class="btn btn-outline-success write" @click="setRoute('/writing')">Write an article</button>
         </li>
       </ul>
-
+      <a class="nav-link logout" @click="logout()">Wyloguj</a>
       <form class="form-inline my-2 my-lg-0">
         <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
         <button class="btn btn-outline-warning my-2 my-sm-0" type="submit">Search</button>
@@ -30,6 +30,7 @@
 </template>
 
 <script>
+import service from "./service.js";
 
 export default {
   name: 'navbar',
@@ -40,6 +41,19 @@ export default {
     setRoute(link){
       this.$router.push(link);
     },
+    logout(){
+      service.authenticated = false;
+      service.id = null;
+      service.nick = "";
+      service.name = "";
+      service.surname = "";
+      service.email = "";
+      service.description = "";
+      this.$router.replace({ name: "login" });
+    },
+    getName(){
+      return service.name;
+    }
   }
 }
 </script>
@@ -72,5 +86,8 @@ align-items: center;
 .write {
   margin-left: 100px;
   width: 200px;
+}
+.logout {
+  cursor: pointer;
 }
 </style>

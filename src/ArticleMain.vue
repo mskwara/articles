@@ -27,7 +27,7 @@
               <img src="./assets/avatar.jpg" class="mr-3 commentAvatar">
               <div class="comContent">
                 <h6>
-                  <a class="username">Michał Skwara</a>
+                  <a class="username">{{comment.userName}} {{comment.userSurname}}</a>
                   {{comment.content}}
                 </h6>
                 <div class="likeIconComments">
@@ -59,6 +59,7 @@
 </template>
 
 <script>
+import service from "./service.js";
 
 export default {
   name: 'articleMain',
@@ -72,6 +73,8 @@ export default {
         articleId: 0,
         content: "",
         userId: 0,
+        userName: "",
+        userSurname: "",
       },
       getCommentsInterval: null,
       loading: true,
@@ -82,7 +85,9 @@ export default {
     addComment(){
       this.loadingNewComment = true;
       this.newComment.articleId = this.$route.params.id;
-      //this.newComment.userId = ;
+      this.newComment.userId = service.id;
+      this.newComment.userName = service.name;
+      this.newComment.userSurname = service.surname;
       this.$http.post('comments/add', this.newComment);
       this.newComment.content = "";
       this.getComments();
@@ -134,6 +139,7 @@ h2 {
 }
 h4 {
   text-align: left;
+  margin-top: 30px;
 }
 h6 {
   font-size: 10pt;
