@@ -9,7 +9,8 @@
       </div>
     </div>
     <div v-if="articles.length == 0 && !loading">
-      Nikt nie napisał jeszcze żadnego artykułu.
+      Nie masz jeszcze żadnego artykułu w swojej kolekcji.<br>
+      Napisz swój pierwszy artykuł <a @click="goWrite()">tutaj</a>.
     </div>
 
   </div>
@@ -17,6 +18,7 @@
 
 <script>
 import ArticleShort from './ArticleShort.vue';
+import service from './service.js';
 
 export default {
   name: 'articles',
@@ -32,12 +34,15 @@ export default {
   },
   methods: {
     getArticles(){
-      this.$http.get('articles').then(response => {
+      this.$http.get('users/'+service.id+"/articles").then(response => {
         if(response.body != null) this.articles = response.body;
         else this.articles = [];
         this.loading = false;
       });
     },
+    goWrite(){
+      this.$router.push({name: 'writing'});
+    }
   },
   mounted(){
     this.getArticles();
@@ -59,5 +64,9 @@ export default {
 }
 .article {
   margin-bottom: 30px;
+}
+a {
+  cursor: pointer;
+  font-weight: bold;
 }
 </style>

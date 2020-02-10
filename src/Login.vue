@@ -56,8 +56,8 @@ export default {
 
               this.$http.get('users/'+this.input.nick).then(response => {
                 this.setLoggedUser(response.body[0].id, response.body[0].nick, response.body[0].name, response.body[0].surname, response.body[0].email, response.body[0].description);
+                this.$router.replace({ name: "home" });
               });
-              this.$router.replace({ name: "home" });
           } else {
               this.failedText = "Wpisałeś niepoprawny nick lub hasło!";
               this.failed = true;

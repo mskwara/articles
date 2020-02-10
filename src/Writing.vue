@@ -15,7 +15,7 @@
         <small id="category" class="form-text text-muted">Wybierz kategorię, do której można zaliczyć twój tekst</small>
       </div>
       <div class="form-group">
-        <label for="content">Content</label>
+        <label for="content">Treść</label>
         <textarea class="form-control" id="content" rows="7" v-model="article.content"></textarea>
       </div>
       <button type="button" class="btn btn-primary publish" @click="publish()">Opublikuj</button>
@@ -30,6 +30,7 @@
 
 <script>
 import categories from "./categories.js";
+import service from "./service.js";
 
 export default {
   name: 'writing',
@@ -53,6 +54,13 @@ export default {
   },
   methods: {
     publish(){
+      this.article.userId = service.id;
+      for(var i = 0 ; i < this.tags.length ; i++){
+        if(this.tags[i].label == this.article.category){
+          this.article.category = this.tags[i].key;
+          break;
+        }
+      }
       this.$http.post('articles/add', this.article);
       this.article.category = this.tags[0].label;
       this.article.content = "";

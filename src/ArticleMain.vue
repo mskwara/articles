@@ -10,15 +10,15 @@
 
           <div class="header">
             <h2 class="mt-0">{{article.title}}</h2>
-            <h6>{{article.date}}</h6>
+            <h6>{{transformDate(article.date)}}</h6>
           </div>
           <p>{{article.content}}</p>
           <div class="bottom">
-            <button type="button" class="btn btn-primary like" @click="like()"><img class="likeIcon" src="./assets/likeWhite.svg" />Like</button>
+            <button type="button" class="btn btn-primary like" @click="likeArticle()" :disabled="checkIfUserLikedAlready('article', article.id)" onclick="this.disabled = true"><img class="likeIcon" src="./assets/likeWhite.svg" />Like</button>
           </div>
         </div>
       </div>
-      <h4>Comments</h4>
+      <h4>Komentarze</h4>
       <div class="commentSection">
         <div class="comments" v-if="comments != null">
 
@@ -31,7 +31,7 @@
                   {{comment.content}}
                 </h6>
                 <div class="likeIconComments">
-                  <img src="./assets/like.svg" @click="likeComment(comment)" />
+                  <img src="./assets/like.svg" @click="likeComment($event, comment)" :class="checkIfUserLikedAlready('comment',comment.id) ? 'likeDisabled' : ''" />
                   <md-tooltip md-direction="right">{{comment.likes}} likes</md-tooltip>
                 </div>
               </div>
@@ -79,6 +79,12 @@ export default {
       getCommentsInterval: null,
       loading: true,
       loadingNewComment: false,
+      like: {
+        type: "",
+        objId: null,
+        userId: null,
+      },
+      loggedUserLikes: [],
     }
   },
   methods: {
@@ -96,17 +102,51 @@ export default {
     getComments(){
       this.$http.get('articles/'+this.$route.params.id+'/comments').then(response => {
         this.comments = response.body;
-        this.loading = false;
+
         this.loadingNewComment = false;
       });
     },
-    like(){
+    likeArticle(){
       this.$http.put('articles/'+this.$route.params.id+'/likes');
+      this.like.type = "article";
+      this.like.objId = this.article.id;
+      this.like.userId = service.id;
+      this.$http.post('likes/add', this.like);
+      this.$http.get('users/'+service.id+"/likes").then(response => {
+        this.loggedUserLikes = response.body;
+      });
     },
-    likeComment(comment){
-      this.$http.put('comments/'+comment.id+'/likes');
-      this.getComments();
-    }
+    likeComment(e, comment){
+      e.target.classList.toggle('likeDisabled');
+      if(!this.checkIfUserLikedAlready('comment',comment.id)){
+        this.$http.put('comments/'+comment.id+'/likes');
+        this.like.type = "comment";
+        this.like.objId = comment.id;
+        this.like.userId = service.id;
+        this.$http.post('likes/add', this.like);
+        this.$http.get('users/'+service.id+"/likes").then(response => {
+          this.loggedUserLikes = response.body;
+        });
+        this.getComments();
+      }
+    },
+    checkIfUserLikedAlready(type, objId){
+      for(var i = 0; i < this.loggedUserLikes.length ; i++){
+        if(this.loggedUserLikes[i].type == type && this.loggedUserLikes[i].objId == objId){
+          return true;
+        }
+      }
+      return false;
+    },
+    transformDate(date){
+      var day = parseInt(date.slice(8,10));
+      var monthTable = ["stycznia", "lutego", "marca", "kwietnia", "maja", "czerwca", "lipca", "sierpnia", "września", "października", "listopada", "grudnia"];
+      var month = monthTable[parseInt(date.slice(5,7))-1];
+      var year = date.slice(0,4);
+      var time = date.slice(11,16);
+      var tDate = day+" "+month+" "+year+", "+time;
+      return tDate;
+    },
   },
   mounted(){
     this.$http.get('articles/'+this.$route.params.id).then(response => {
@@ -114,6 +154,13 @@ export default {
     });
     this.getComments();
     this.getCommentsInterval = setInterval(this.getComments, 5000);
+    this.$http.get('users/'+service.id+"/likes").then(response => {
+      if(response.body != null){
+        this.loggedUserLikes = response.body;
+      }
+      else this.loggedUserLikes = [];
+      this.loading = false;
+    });
   },
   destroyed(){
     clearInterval(this.getCommentsInterval);
@@ -189,6 +236,7 @@ button {
   min-height: 20px !important;
   margin-right: 5px;
   float: right;
+  cursor: pointer;
 }
 .comContent {
   display: flex;
@@ -218,5 +266,8 @@ button {
   flex-direction: row;
   justify-content: flex-end;
   align-items: center;
+}
+.likeDisabled {
+  opacity: 30%;
 }
 </style>

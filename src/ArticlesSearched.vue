@@ -1,5 +1,5 @@
 <template>
-  <div id="articles">
+  <div id="articlessearched">
     <div class="spinner-border text-primary" role="status" v-if="loading">
       <span class="sr-only">Loading...</span>
     </div>
@@ -9,7 +9,7 @@
       </div>
     </div>
     <div v-if="articles.length == 0 && !loading">
-      Nikt nie napisał jeszcze żadnego artykułu.
+      Nie znaleziono frazy "{{phrase}}" w żadnym artykule.
     </div>
 
   </div>
@@ -19,7 +19,7 @@
 import ArticleShort from './ArticleShort.vue';
 
 export default {
-  name: 'articles',
+  name: 'articlessearched',
   components: {
     ArticleShort
   },
@@ -28,18 +28,20 @@ export default {
       articles: [],
       getArticlesInterval: null,
       loading: true,
+      phrase: "",
     }
   },
   methods: {
     getArticles(){
-      this.$http.get('articles').then(response => {
+      this.$http.get('articles/search/'+this.phrase).then(response => {
         if(response.body != null) this.articles = response.body;
         else this.articles = [];
         this.loading = false;
       });
     },
   },
-  mounted(){
+  created(){
+    this.phrase = this.$route.params.phrase;
     this.getArticles();
     this.getArticlesInterval = setInterval(this.getArticles, 10000);
   },

@@ -5,11 +5,11 @@
       <div class="media-body">
         <div class="header">
           <h2 class="mt-0">{{article.title}}</h2>
-          <h6>{{article.date}}</h6>
+          <h6>{{transformDate(article.date)}}</h6>
         </div>
         <p>{{article.content}}</p>
         <div class="bottom">
-          <button type="button" class="btn btn-primary" @click="goToArticle(article.id)">Read more</button>
+          <button type="button" class="btn btn-primary" @click="goToArticle(article.id)">Czytaj dalej</button>
 
           <div class="likeCom">
             <span class="comment"><img src="./assets/comment.svg" /><md-tooltip md-direction="left">{{article.commentsNumber}} comments</md-tooltip></span>
@@ -36,8 +36,17 @@ export default {
   },
   methods: {
     goToArticle(id){
-      this.$router.push("article/"+id);
+      this.$router.push({ name: 'article', params: { id: id }});
     },
+    transformDate(date){
+      var day = parseInt(date.slice(8,10));
+      var monthTable = ["stycznia", "lutego", "marca", "kwietnia", "maja", "czerwca", "lipca", "sierpnia", "września", "października", "listopada", "grudnia"];
+      var month = monthTable[parseInt(date.slice(5,7))-1];
+      var year = date.slice(0,4);
+      var time = date.slice(11,16);
+      var tDate = day+" "+month+" "+year+", "+time;
+      return tDate;
+    }
   },
 }
 </script>

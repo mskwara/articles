@@ -5,14 +5,14 @@
 
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav mr-auto">
-        <li class="nav-item active">
-          <router-link class="nav-link" to="/articles">Home <span class="sr-only">(current)</span></router-link>
+        <li class="nav-item">
+          <router-link class="nav-link" to="/articles">Home</router-link>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="#">My articles</a>
+          <router-link class="nav-link" to="/myarticles">My articles</router-link>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="#"><img class="avatar" src="./assets/avatar.jpg" />{{getName()}}</a>
+          <a class="nav-link" href="#"><img class="avatar" src="./assets/avatar.jpg" />{{username}}</a>
         </li>
         <li class="nav-item">
           <button class="btn btn-outline-success write" @click="setRoute('/writing')">Write an article</button>
@@ -20,8 +20,8 @@
       </ul>
       <a class="nav-link logout" @click="logout()">Wyloguj</a>
       <form class="form-inline my-2 my-lg-0">
-        <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-        <button class="btn btn-outline-warning my-2 my-sm-0" type="submit">Search</button>
+        <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" v-model="searchPhrase">
+        <button class="btn btn-outline-warning my-2 my-sm-0" type="submit" :disabled="searchPhrase == ''" @click="search">Search</button>
       </form>
     </div>
   </nav>
@@ -34,8 +34,11 @@ import service from "./service.js";
 
 export default {
   name: 'navbar',
-  components: {
-
+  data(){
+    return {
+      username: "",
+      searchPhrase: "",
+    }
   },
   methods: {
     setRoute(link){
@@ -51,9 +54,13 @@ export default {
       service.description = "";
       this.$router.replace({ name: "login" });
     },
-    getName(){
-      return service.name;
+    search(){
+      this.$router.push({ name: 'articlessearched', params: { phrase: this.searchPhrase }});
+      this.searchPhrase = "";
     }
+  },
+  mounted(){
+    this.username = service.name;
   }
 }
 </script>

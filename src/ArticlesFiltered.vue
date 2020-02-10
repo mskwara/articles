@@ -1,5 +1,5 @@
 <template>
-  <div id="articles">
+  <div id="articlesfiltered">
     <div class="spinner-border text-primary" role="status" v-if="loading">
       <span class="sr-only">Loading...</span>
     </div>
@@ -9,7 +9,7 @@
       </div>
     </div>
     <div v-if="articles.length == 0 && !loading">
-      Nikt nie napisał jeszcze żadnego artykułu.
+      Nikt nie napisał jeszcze żadnego artykułu w kategorii "{{category}}".
     </div>
 
   </div>
@@ -17,9 +17,10 @@
 
 <script>
 import ArticleShort from './ArticleShort.vue';
+import categories from './categories.js';
 
 export default {
-  name: 'articles',
+  name: 'articlesfiltered',
   components: {
     ArticleShort
   },
@@ -28,18 +29,26 @@ export default {
       articles: [],
       getArticlesInterval: null,
       loading: true,
+      category: "",
+      categories: categories.categories,
     }
   },
   methods: {
     getArticles(){
-      this.$http.get('articles').then(response => {
+      this.$http.get('articles/category/'+this.$route.params.category).then(response => {
         if(response.body != null) this.articles = response.body;
         else this.articles = [];
         this.loading = false;
       });
     },
   },
-  mounted(){
+  created(){
+    for(var i = 0 ; i < this.categories.length ; i++){
+      if(this.categories[i].key == this.$route.params.category){
+        this.category = this.categories[i].label;
+        break;
+      }
+    }
     this.getArticles();
     this.getArticlesInterval = setInterval(this.getArticles, 10000);
   },
