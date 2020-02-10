@@ -1,27 +1,27 @@
 <template>
 <div id="navbar">
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top shadow-sm">
-    <router-link class="navbar-brand" to="/">Articles</router-link>
+    <router-link class="navbar-brand" to="/"><img class="logo" src="./assets/logo.png" /></router-link>
 
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav mr-auto">
         <li class="nav-item">
-          <router-link class="nav-link" to="/articles">Home</router-link>
+          <router-link class="nav-link routerlink" to="/articles">Przegląd</router-link>
         </li>
         <li class="nav-item">
-          <router-link class="nav-link" to="/myarticles">My articles</router-link>
+          <router-link class="nav-link routerlink" to="/myarticles">Moje artykuły</router-link>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="#"><img class="avatar" src="./assets/avatar.jpg" />{{username}}</a>
+          <router-link class="nav-link routerlink" to="/profile"><img class="avatar" src="./assets/avatar.jpg" />{{username}}</router-link>
         </li>
         <li class="nav-item">
-          <button class="btn btn-outline-success write" @click="setRoute('/writing')">Write an article</button>
+          <button class="btn btn-outline-success write" @click="setRoute('/writing')">Napisz artykuł</button>
         </li>
       </ul>
       <a class="nav-link logout" @click="logout()">Wyloguj</a>
       <form class="form-inline my-2 my-lg-0">
-        <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" v-model="searchPhrase">
-        <button class="btn btn-outline-warning my-2 my-sm-0" type="submit" :disabled="searchPhrase == ''" @click="search">Search</button>
+        <input class="form-control mr-sm-2" type="search" placeholder="Wpisz szukaną frazę" aria-label="Search" v-model="searchPhrase">
+        <button class="btn btn-outline-warning my-2 my-sm-0" type="submit" :disabled="searchPhrase == ''" @click="search">Szukaj</button>
       </form>
     </div>
   </nav>
@@ -67,25 +67,29 @@ export default {
 
 <style scoped>
 #navbar {
-font-family: 'Avenir', Helvetica, Arial, sans-serif;
--webkit-font-smoothing: antialiased;
--moz-osx-font-smoothing: grayscale;
-text-align: center;
-color: #2c3e50;
-overflow-y: hidden;
+  font-family: 'Avenir', Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-align: center;
+  color: #2c3e50;
+  overflow-y: hidden;
 }
 .avatar {
-width: 30px;
-border-radius: 50px;
-margin-right: 10px;
+  width: 30px;
+  border-radius: 50px;
+  margin-right: 10px;
 }
 .nav-item {
-display: flex !important;
-align-items: center;
+  display: flex !important;
+  align-items: center;
 }
 .nav-link {
-display: flex !important;
-align-items: center;
+  display: flex !important;
+  align-items: center;
+  outline: 0;
+}
+.routerlink:hover {
+  color: white !important;
 }
 .header {
   padding-top: 10px;
@@ -96,5 +100,12 @@ align-items: center;
 }
 .logout {
   cursor: pointer;
+}
+.logo {
+  width: 130px;
+  outline: 0;
+}
+.navbar-brand {
+  outline: 0;
 }
 </style>
