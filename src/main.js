@@ -17,6 +17,12 @@ import VueMaterial from 'vue-material'
 import 'vue-material/dist/vue-material.min.css'
 import 'vue-material/dist/theme/default.css'
 
+import StarRating from 'vue-star-rating'
+
+
+
+Vue.component('star-rating', StarRating);
+
 Vue.use(VueMaterial)
 
 

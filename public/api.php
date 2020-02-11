@@ -35,6 +35,74 @@ $app->get('/api/articles',
         return $response->withJson($array);
     }
 );
+$app->get('/api/articles/{articleId}/rating/user/{userId}',
+    function (Request $request, Response $response, array $args) {
+        $servername = "serwer2001916.home.pl";
+        $username = "32213694_scoreboard";
+        $password = "Fell!Dell!=";
+        $dbname = "32213694_scoreboard";
+        // Create connection
+        $conn = new mysqli($servername, $username, $password, $dbname);
+        // Check connection
+        if ($conn->connect_error) {
+            die("Connection failed: " . $conn->connect_error);
+        }
+        $articleId = $args['articleId'];
+        $userId = $args['userId'];
+        $sql = "SELECT * FROM rating WHERE articleId = $articleId AND userId = $userId";
+        $result = $conn->query($sql);
+        $array = [];
+
+        if ($result->num_rows > 0) {
+            // output data of each row
+            while($row = $result->fetch_assoc()) {
+                $array[] = $row;
+            }
+        } else {
+            echo "0 results";
+        }
+        $conn->close();
+        return $response->withJson($array);
+    }
+);
+$app->get('/api/articles/{articleId}/averageRating',
+    function (Request $request, Response $response, array $args) {
+        $servername = "serwer2001916.home.pl";
+        $username = "32213694_scoreboard";
+        $password = "Fell!Dell!=";
+        $dbname = "32213694_scoreboard";
+        // Create connection
+        $conn = new mysqli($servername, $username, $password, $dbname);
+        // Check connection
+        if ($conn->connect_error) {
+            die("Connection failed: " . $conn->connect_error);
+        }
+        $articleId = $args['articleId'];
+        $sql = "SELECT rating FROM rating WHERE articleId = $articleId";
+        $result = $conn->query($sql);
+        $count = 0;
+        $avg = 0;
+
+        if ($result->num_rows > 0) {
+            // output data of each row
+            while($row = $result->fetch_assoc()) {
+                $avg = $avg + $row['rating'];
+                $count = $count + 1;
+            }
+        }
+        if($count > 0){
+          $wynik = [
+             ['avg' => $avg, 'count' => $count],
+          ];
+        }
+        else {
+          $wynik = null;
+        }
+
+        $conn->close();
+        return $response->withJson($wynik);
+    }
+);
 $app->get('/api/users/{userId}/articles',
     function (Request $request, Response $response, array $args) {
         $servername = "serwer2001916.home.pl";
@@ -376,6 +444,96 @@ $app->post('/api/likes/add',
   }
 
 );
+$app->post('/api/rating/add',
+     function (Request $request, Response $response, array $args) {
+
+      $servername = "serwer2001916.home.pl";
+      $username = "32213694_scoreboard";
+      $password = "Fell!Dell!=";
+      $dbname = "32213694_scoreboard";
+
+      $requestData = $request->getParsedBody();
+      // Create connection
+      $conn = new mysqli($servername, $username, $password, $dbname);
+      // Check connection
+      if ($conn->connect_error) {
+          die("Connection failed: " . $conn->connect_error);
+      }
+
+      $sql = "INSERT INTO rating (articleId, userId, rating) VALUES('$requestData[articleId]', '$requestData[userId]', '$requestData[rating]')";
+
+      if ($conn->query($sql) === TRUE) {
+          echo "New record created successfully";
+      } else {
+          echo "Error: " . $sql . "<br>" . $conn->error;
+      }
+
+      $conn->close();
+      return $requestData;
+  }
+
+);
+$app->put('/api/rating/update',
+     function (Request $request, Response $response, array $args) {
+
+      $servername = "serwer2001916.home.pl";
+      $username = "32213694_scoreboard";
+      $password = "Fell!Dell!=";
+      $dbname = "32213694_scoreboard";
+
+      $requestData = $request->getParsedBody();
+      // Create connection
+      $conn = new mysqli($servername, $username, $password, $dbname);
+      // Check connection
+      if ($conn->connect_error) {
+          die("Connection failed: " . $conn->connect_error);
+      }
+
+      $sql = "UPDATE rating SET rating = '$requestData[rating]' WHERE id = '$requestData[id]'";
+
+      if ($conn->query($sql) === TRUE) {
+          echo "New record created successfully";
+      } else {
+          echo "Error: " . $sql . "<br>" . $conn->error;
+      }
+
+      $conn->close();
+      return $requestData;
+  }
+
+);
+$app->post('/api/likes/delete',
+     function (Request $request, Response $response, array $args) {
+
+      $servername = "serwer2001916.home.pl";
+      $username = "32213694_scoreboard";
+      $password = "Fell!Dell!=";
+      $dbname = "32213694_scoreboard";
+
+      $requestData = $request->getParsedBody();
+      // Create connection
+      $conn = new mysqli($servername, $username, $password, $dbname);
+      // Check connection
+      if ($conn->connect_error) {
+          die("Connection failed: " . $conn->connect_error);
+      }
+      $type = $requestData['type'];
+      $objId = $requestData['objId'];
+      $userId = $requestData['userId'];
+
+      $sql = "DELETE FROM likes WHERE type = \"$type\" AND objId = $objId AND userId = $userId";
+
+      if ($conn->query($sql) === TRUE) {
+          echo "New record created successfully";
+      } else {
+          echo "Error: " . $sql . "<br>" . $conn->error;
+      }
+
+      $conn->close();
+      return $requestData;
+  }
+
+);
 $app->post('/api/articles/add',
      function (Request $request, Response $response, array $args) {
 
@@ -529,7 +687,7 @@ $app->put('/api/articles/{id}/likes',
   }
 
 );
-$app->put('/api/comments/{id}/likes',
+$app->put('/api/comments/{id}/incrementLikes',
      function (Request $request, Response $response, array $args) {
 
       $servername = "serwer2001916.home.pl";
@@ -546,6 +704,35 @@ $app->put('/api/comments/{id}/likes',
       }
       $id = $args['id'];
       $sql = "UPDATE comments SET likes=likes+1 WHERE id=$id";
+
+      if ($conn->query($sql) === TRUE) {
+          echo "New record created successfully";
+      } else {
+          echo "Error: " . $sql . "<br>" . $conn->error;
+      }
+
+      $conn->close();
+      return $requestData;
+  }
+
+);
+$app->put('/api/comments/{id}/decrementLikes',
+     function (Request $request, Response $response, array $args) {
+
+      $servername = "serwer2001916.home.pl";
+      $username = "32213694_scoreboard";
+      $password = "Fell!Dell!=";
+      $dbname = "32213694_scoreboard";
+
+      $requestData = $request->getParsedBody();
+      // Create connection
+      $conn = new mysqli($servername, $username, $password, $dbname);
+      // Check connection
+      if ($conn->connect_error) {
+          die("Connection failed: " . $conn->connect_error);
+      }
+      $id = $args['id'];
+      $sql = "UPDATE comments SET likes=likes-1 WHERE id=$id";
 
       if ($conn->query($sql) === TRUE) {
           echo "New record created successfully";

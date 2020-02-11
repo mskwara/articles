@@ -31,8 +31,9 @@
           <input type="nick" class="form-control nickInput" placeholder="Nick" v-model="user.nick" aria-describedby="nickHelp" disabled>
             <small id="nickHelp" class="form-text text-muted">Ustalonego przy rejestracji nicku nie można już zmienić...</small>
         </div>
-        <div class="form-group">
+        <div class="form-group pass">
           <input type="password" class="form-control" placeholder="Bieżące hasło" v-model="user.password">
+          <button class="btn btn-warning chPass" data-toggle="changePasswordDialog">Zmień hasło</button>
         </div>
         <div class="buttons">
           <button type="submit" class="btn btn-primary" @click="update()">Zaktualizuj dane</button>
@@ -54,6 +55,9 @@
       md-title="Coś poszło nie tak..."
       md-content="Sprawdź poprawność wszystkich pól."
       md-confirm-text="Zamknij" />
+
+
+
 
 </div>
 </template>
@@ -78,6 +82,7 @@ export default {
       },
       success: false,
       failed: false,
+      changePasswordDialog: false,
     }
   },
   mounted(){
@@ -118,6 +123,9 @@ export default {
         this.user.password = "";
         this.failed = true;
       }
+    },
+    changePassword(){
+
     },
     goToLogin(){
       this.$router.replace({ name: "login" });
@@ -175,5 +183,14 @@ a {
 }
 .nickInput {
   margin-top: 20px;
+}
+.pass {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+.chPass {
+  width: 170px;
+  margin-left: 20px;
 }
 </style>
