@@ -93,6 +93,7 @@ export default {
           }
           reader.readAsDataURL(input.files[0]);
       }
+
     },
     register(){
       if(this.newUser.name != "" && this.newUser.surname != ""

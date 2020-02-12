@@ -50,12 +50,12 @@ color: #2c3e50;
 overflow: hidden;
 }
 .leftPanel {
+  min-width: 150px;
   width: 300px;
-  min-width: 300px;
   height: 100vh;
   border-right: 1px solid gray;
   background-color: #fafafa;
-  position: fixed;
+
 }
 .header {
   padding-top: 10px;

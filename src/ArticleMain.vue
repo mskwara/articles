@@ -9,6 +9,9 @@
           <img src="./assets/avatar.jpg" class="mr-3 avatar">
           <div class="averageRating" v-if="articleRating != null">
             <h3 class="avg">{{averageRating}}</h3>
+            <star-rating class="avgRating" v-model="averageRating" read-only="true" :increment="0.01" :star-size="20" :show-rating="false"
+               :border-width="4" border-color="#d8d8d8" :rounded-corners="true"
+               :star-points="[23,2, 14,17, 0,19, 10,34, 7,50, 23,43, 38,50, 36,34, 46,19, 31,17]"></star-rating>
             <h6 class="avgCount" v-if="articleRating.count > 1">Na podstawie opinii {{articleRating.count}} osób</h6>
             <h6 class="avgCount" v-if="articleRating.count == 1">Na podstawie opinii {{articleRating.count}} osoby</h6>
           </div>
@@ -52,8 +55,12 @@
           </div>
         </div>
         <div class="nocomments" v-else>
-          Bądź pierwszą osobą która zamieści komentarz!
+          Bądź pierwszą osobą która zamieści komentarz!<br>
+          <div class="spinner-grow text-primary" role="status" v-if="loadingNewComment">
+            <span class="sr-only">Loading...</span>
+          </div>
         </div>
+
 
 
         <div class="createComment">
@@ -138,18 +145,14 @@ export default {
           this.articleRating = null;
           this.averageRating = "-";
         }
+        var obj = {};
+        obj.rating = this.averageRating;
+        this.$http.put('articles/'+this.article.id+'/rating', obj);
 
       });
     },
     likeArticle(){
-      this.$http.put('articles/'+this.$route.params.id+'/likes');
-      this.like.type = "article";
-      this.like.objId = this.article.id;
-      this.like.userId = service.id;
-      this.$http.post('likes/add', this.like);
-      this.$http.get('users/'+service.id+"/likes").then(response => {
-        this.loggedUserLikes = response.body;
-      });
+
     },
     likeComment(e, comment){
       if(this.checkIfUserLikedAlready('comment',comment.id) == false){
@@ -200,12 +203,15 @@ export default {
     setRating(rating) {
       this.myRate.rating = rating;
       if(this.myRate.id == null){
-        this.$http.post('rating/add', this.myRate);
+        this.$http.post('rating/add', this.myRate).then(()=>{
+          this.getAverageRating();
+        });
       }
       else {
-        this.$http.put('rating/update', this.myRate);
+        this.$http.put('rating/update', this.myRate).then(()=>{
+          this.getAverageRating();
+        });
       }
-      this.getAverageRating();
     },
   },
   mounted(){
@@ -349,10 +355,14 @@ button {
   align-items: center;
 }
 .likeDisabled {
-  opacity: 30% !important;
+  opacity: 0.4 !important;
 }
 .rating {
   margin-right: 30px;
+}
+.avgRating {
+  justify-content: center;
+  margin-bottom: 10px;
 }
 .info {
   display: flex;

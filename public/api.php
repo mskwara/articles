@@ -658,7 +658,7 @@ $app->put('/api/articles/{id}/commentsNumber',
   }
 
 );
-$app->put('/api/articles/{id}/likes',
+$app->put('/api/articles/{id}/rating',
      function (Request $request, Response $response, array $args) {
 
       $servername = "serwer2001916.home.pl";
@@ -674,7 +674,7 @@ $app->put('/api/articles/{id}/likes',
           die("Connection failed: " . $conn->connect_error);
       }
       $id = $args['id'];
-      $sql = "UPDATE articles SET likes=likes+1 WHERE id=$id";
+      $sql = "UPDATE articles SET rating='$requestData[rating]' WHERE id=$id";
 
       if ($conn->query($sql) === TRUE) {
           echo "New record created successfully";

@@ -74,6 +74,9 @@ export default {
   color: #2c3e50;
   overflow-y: hidden;
 }
+.navbar {
+  max-height: 65px !important;
+}
 .avatar {
   width: 30px;
   border-radius: 50px;

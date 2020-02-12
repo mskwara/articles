@@ -5,15 +5,18 @@
       <div class="media-body">
         <div class="header">
           <h2 class="mt-0">{{article.title}}</h2>
+          <star-rating v-if="article.rating != 0.0" class="avgRating" v-model="article.rating" read-only="true"
+            :increment="0.01" :star-size="20" :show-rating="false"
+             :border-width="4" border-color="#d8d8d8" :rounded-corners="true"
+             :star-points="[23,2, 14,17, 0,19, 10,34, 7,50, 23,43, 38,50, 36,34, 46,19, 31,17]"></star-rating>
           <h6>{{transformDate(article.date)}}</h6>
         </div>
         <p>{{article.content}}</p>
         <div class="bottom">
           <button type="button" class="btn btn-primary" @click="goToArticle(article.id)">Czytaj dalej</button>
 
-          <div class="likeCom">
-            <span class="comment"><img src="./assets/comment.svg" /><md-tooltip md-direction="left">{{article.commentsNumber}} comments</md-tooltip></span>
-            <span class="like"><img src="./assets/like.svg" /><md-tooltip md-direction="right">{{article.likes}} likes</md-tooltip></span>
+          <div class="comment" v-if="article.commentsNumber > 0">
+            <img src="./assets/comment.svg" />
           </div>
         </div>
       </div>
@@ -52,7 +55,7 @@ export default {
 </script>
 
 <style scoped>
-#articles {
+#article {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -82,6 +85,9 @@ p {
    display: -webkit-box;
    -webkit-box-orient: vertical;
    -webkit-line-clamp: 6; /* number of lines to show */
+   word-wrap: break-word;
+   max-width: 800px;
+   min-width: 500px;
 }
 .header {
   display: flex;
@@ -108,11 +114,10 @@ button {
   flex-direction: row;
   justify-content: space-between;
 }
-.likeCom {
-  width: 150px;
-  display: flex;
-  flex-direction: row;
-  align-items: flex-end;
-  font-size: 11pt;
+.avgRating {
+  margin: 3px 0 0 20px;
+  padding: 0;
+  align-items: flex-start !important;
+  flex: 1;
 }
 </style>
