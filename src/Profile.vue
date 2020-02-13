@@ -23,7 +23,12 @@
 
         <div class="form-group custom-file">
           <input type="file" class="custom-file-input" @change="onFileChange($event)" aria-describedby="avatarHelp">
-          <small id="avatarHelp" class="form-text text-muted">Dodaj nieco świeżości i zaktualizuj swoje zdjęcie!</small>
+          <small id="avatarHelp" class="form-text text-muted">
+            Dodaj nieco świeżości i zaktualizuj swoje zdjęcie!<br>
+            - Zdjęcie musi być kwadratowe o rozmiarze 200x200 px<br>
+            - Maksymalny rozmiar to 200KB
+            <a href="http://download940.mediafire.com/1y6t0gkfu9ug/52p54otq7ls8fak/photo_upload_instruction.pdf">Nie wiesz jak przyciąć i zmniejszyć zdjęcie?</a>
+          </small>
           <label class="custom-file-label">Wybierz zdjęcie</label>
         </div>
 
