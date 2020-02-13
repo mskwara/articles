@@ -41,7 +41,7 @@
       </form>
     </div>
     <div>
-      <img class="avatar" :src="user.avatar">
+      <img v-if="user.avatar.length > 0" class="avatar" :src="user.avatar">
     </div>
   </div>
 
@@ -64,6 +64,7 @@
 
 <script>
 import service from './service.js';
+import { EventBus } from './event-bus.js';
 
 export default {
   name: 'profile',
@@ -91,6 +92,7 @@ export default {
     this.user.nick = service.nick;
     this.user.description = service.description;
     this.user.email = service.email;
+    this.user.avatar = service.avatar;
   },
   methods: {
     onFileChange(event) {
@@ -111,7 +113,9 @@ export default {
             this.user.password = "";
             service.email = this.user.email;
             service.description = this.user.description;
+            service.avatar = this.user.avatar;
             this.success = true;
+            EventBus.$emit('update-user');
           }
           else {
             this.user.password = "";

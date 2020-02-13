@@ -12,7 +12,11 @@
           <router-link class="nav-link routerlink" to="/myarticles">Moje artykuły</router-link>
         </li>
         <li class="nav-item">
-          <router-link class="nav-link routerlink" to="/profile"><img class="avatar" src="./assets/avatar.jpg" />{{username}}</router-link>
+          <router-link class="nav-link routerlink" to="/profile">
+            <img v-if="image.length > 0" class="avatar" :src="image" />
+            <img v-else src="./assets/avatar.png" class="mr-3 avatar">
+            {{username}}
+          </router-link>
         </li>
         <li class="nav-item">
           <button class="btn btn-outline-success write" @click="setRoute('/writing')">Napisz artykuł</button>
@@ -31,6 +35,7 @@
 
 <script>
 import service from "./service.js";
+import { EventBus } from './event-bus.js';
 
 export default {
   name: 'navbar',
@@ -38,6 +43,7 @@ export default {
     return {
       username: "",
       searchPhrase: "",
+      image: "",
     }
   },
   methods: {
@@ -61,6 +67,12 @@ export default {
   },
   mounted(){
     this.username = service.name;
+    this.image = service.avatar;
+
+    EventBus.$on('update-user', () => {
+      this.image = service.avatar;
+
+    });
   }
 }
 </script>

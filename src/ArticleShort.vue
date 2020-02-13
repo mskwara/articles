@@ -1,7 +1,8 @@
 <template>
   <div id="article">
     <div class="media">
-      <img src="./assets/avatar.jpg" class="mr-3 avatar">
+      <img v-if="image.length > 0" :src="image" class="mr-3 avatar">
+      <img v-else src="./assets/avatar.png" class="mr-3 avatar">
       <div class="media-body">
         <div class="header">
           <h2 class="mt-0">{{article.title}}</h2>
@@ -35,7 +36,13 @@ export default {
   },
   data(){
     return {
+      image: "",
     }
+  },
+  mounted(){
+    this.$http.get('users/'+this.article.userId+'/avatar').then(response => {
+      this.image = response.body[0].avatar;
+    });
   },
   methods: {
     goToArticle(id){

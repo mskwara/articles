@@ -8,6 +8,7 @@ export default {
       surname: "",
       email: "",
       description: "",
+      avatar: "",
     }
   }
 }

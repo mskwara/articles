@@ -15,6 +15,9 @@
         <a @click="goToRegister()">Nie masz konta?</a>
       </div>
     </form>
+    <div class="spinner-border text-primary loading" role="status" v-if="loading">
+      <span class="sr-only">Loading...</span>
+    </div>
 
   </div>
 
@@ -42,6 +45,7 @@ export default {
       },
       failed: false,
       failedText: "",
+      loading: false,
     }
   },
   mounted(){
@@ -49,13 +53,16 @@ export default {
   },
   methods: {
     login() {
+      this.loading = true;
       if(this.input.nick != "" && this.input.password != "") {
         this.$http.post('validateLogin', this.input).then(response => {
           if(response.body == "true"){
               this.$emit("authenticated", true);
 
               this.$http.get('users/'+this.input.nick).then(response => {
-                this.setLoggedUser(response.body[0].id, response.body[0].nick, response.body[0].name, response.body[0].surname, response.body[0].email, response.body[0].description);
+                this.setLoggedUser(response.body[0].id, response.body[0].nick, response.body[0].name,
+                   response.body[0].surname, response.body[0].email, response.body[0].description, response.body[0].avatar);
+                this.loading = false;
                 this.$router.replace({ name: "home" });
               });
           } else {
@@ -63,23 +70,26 @@ export default {
               this.failed = true;
               this.input.nick = "";
               this.input.password = "";
+              this.loading = false;
           }
         });
       } else {
         this.failedText = "Uzupełnij wszystkie pola żeby się zalogować!";
         this.failed = true;
+        this.loading = false;
       }
     },
     goToRegister(){
       this.$router.replace({ name: "register" });
     },
-    setLoggedUser(id, nick, name, surname, email, description){
+    setLoggedUser(id, nick, name, surname, email, description, avatar){
       service.id = id;
       service.nick = nick;
       service.name = name;
       service.surname = surname;
       service.email = email;
       service.description = description;
+      service.avatar = avatar;
     },
   },
 }
@@ -112,5 +122,8 @@ a {
   position: absolute;
   right: 0;
   cursor: pointer;
+}
+.loading {
+  margin-top: 20px;
 }
 </style>

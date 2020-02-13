@@ -6,7 +6,8 @@
     <div class="media" v-if="!loading">
       <div class="container">
         <div class="info">
-          <img src="./assets/avatar.jpg" class="mr-3 avatar">
+          <img v-if="image.length > 0" :src="image" class="mr-3 avatar">
+          <img v-else src="./assets/avatar.png" class="mr-3 avatar">
           <div class="averageRating" v-if="articleRating != null">
             <h3 class="avg">{{averageRating}}</h3>
             <star-rating class="avgRating" v-model="averageRating" read-only="true" :increment="0.01" :star-size="20" :show-rating="false"
@@ -36,7 +37,8 @@
 
           <ul class="list-group">
             <li class="list-group-item" :key="comment.id" v-for="comment in comments">
-              <img src="./assets/avatar.jpg" class="mr-3 commentAvatar">
+              <img v-if="getCommentImage(comment).length > 0" :src="getCommentImage(comment)" class="mr-3 commentAvatar">
+              <img v-else src="./assets/avatar.png" class="mr-3 commentAvatar">
               <div class="comContent">
                 <h6>
                   <a class="username">{{comment.userName}} {{comment.userSurname}}</a>
@@ -112,6 +114,8 @@ export default {
       },
       articleRating: null,
       averageRating: null,
+      image: "",
+      commentsAvatars: [],
     }
   },
   methods: {
@@ -131,6 +135,16 @@ export default {
         if(response.body != null)  this.comments = response.body;
         else this.comments = [];
 
+        for(var i = 0 ; i < this.comments.length ; i++){
+          var obj = this.comments[i];
+          this.$http.get('users/'+this.comments[i].userId+'/avatar').then(response => {
+            this.commentsAvatars.push({
+              id: obj.id,
+              avatar: response.body[0].avatar
+            });
+          });
+
+        }
         this.loadingNewComment = false;
       });
     },
@@ -150,9 +164,6 @@ export default {
         this.$http.put('articles/'+this.article.id+'/rating', obj);
 
       });
-    },
-    likeArticle(){
-
     },
     likeComment(e, comment){
       if(this.checkIfUserLikedAlready('comment',comment.id) == false){
@@ -213,12 +224,23 @@ export default {
         });
       }
     },
+    getCommentImage(comment){
+      for(var i = 0 ; i < this.commentsAvatars.length ; i++){
+        if(this.commentsAvatars[i].id == comment.id){
+          return this.commentsAvatars[i].avatar;
+        }
+      }
+      return "";
+    }
   },
   mounted(){
     this.$http.get('articles/'+this.$route.params.id).then(response => {
       this.article = response.body[0];
       this.myRate.articleId = this.article.id;
       this.getAverageRating();
+      this.$http.get('users/'+this.article.userId+'/avatar').then(response => {
+        this.image = response.body[0].avatar;
+      });
     });
     this.myRate.userId = service.id;
     this.$http.get('articles/'+this.$route.params.id+'/rating/user/'+service.id).then(response => {
@@ -292,6 +314,9 @@ h6 {
 p {
   margin-left: 20px;
   white-space: pre-line;
+  word-wrap: break-word;
+  max-width: 800px;
+  min-width: 500px;
 }
 .header {
   display: flex;

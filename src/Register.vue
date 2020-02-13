@@ -23,7 +23,12 @@
 
         <div class="form-group custom-file">
           <input type="file" class="custom-file-input" @change="onFileChange($event)" aria-describedby="avatarHelp">
-          <small id="avatarHelp" class="form-text text-muted">Wraz ze zdjęciem twoje artykuły będą prezentować się znacznie lepiej!</small>
+          <small id="avatarHelp" class="form-text text-muted">
+            Wraz ze zdjęciem twoje artykuły będą prezentować się znacznie lepiej!<br>
+            - Zdjęcie musi być kwadratowe o rozmiarze 200x200 px<br>
+            - Maksymalny rozmiar to 200KB
+            <a href="http://download940.mediafire.com/1y6t0gkfu9ug/52p54otq7ls8fak/photo_upload_instruction.pdf">Nie wiesz jak przyciąć i zmniejszyć zdjęcie?</a>
+          </small>
           <label class="custom-file-label">Wybierz zdjęcie</label>
         </div>
 
@@ -55,6 +60,11 @@
       md-title="Coś poszło nie tak..."
       md-content="Nie udało się zarejestrować. Sprawdź poprawność wszystkich pól."
       md-confirm-text="Zamknij" />
+  <md-dialog-alert
+      :md-active.sync="imageError"
+      md-title="Mamy problem..."
+      :md-content="imageErrorText"
+      md-confirm-text="Zamknij" />
 
 </div>
 </template>
@@ -78,6 +88,8 @@ export default {
       },
       success: false,
       failed: false,
+      imageError: false,
+      imageErrorText: "",
     }
   },
   mounted(){
@@ -85,9 +97,41 @@ export default {
   },
   methods: {
     onFileChange(event) {
+      //this.newUser.avatar = event.target.files[0];  //do firebase
+      const file = event.target.files[0];
+      if(!file || file.type.indexOf('image/') !== 0){ //zły format pliku
+        event.preventDefault();
+        this.imageErrorText = "Wybrałeś nieprawidłowy format pliku!";
+        this.imageError = true;
+        return;
+      }
+
+      let reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = evt => {
+        let img = new Image();
+        img.onload = () => {
+          if(img.width != 200 || img.height != 200){    //czy ma wymiary 200x200
+            event.preventDefault();
+            this.imageErrorText = "Avatar musi mieć wymiary 200x200 px!";
+            this.imageError = true;
+            return;
+          }
+        }
+        img.src = evt.target.result;
+      }
+
+
+      if (file.size > 1024 * 200) {    //czy rozmiar < 200 KB
+        event.preventDefault();
+        this.imageErrorText = "Plik ma zbyt duży rozmiar! Maksymalny dopuszczalny to 200KB.";
+        this.imageError = true;
+        return;
+      }
+
       var input = event.target;
       if (input.files && input.files[0]) {
-          var reader = new FileReader();
+          reader = new FileReader();
           reader.onload = (e) => {
               this.newUser.avatar = e.target.result;
           }
@@ -96,6 +140,10 @@ export default {
 
     },
     register(){
+      // const axios = require('axios').default;
+      // const formData = new FormData()
+      // formData.append('image', this.newUser.avatar, this.newUser.avatar.name)
+      // axios.post('https://us-central1-oczymmyslisz-ad918.cloudfunctions.net/uploadFile ', formData)
       if(this.newUser.name != "" && this.newUser.surname != ""
        && this.newUser.nick != "" && this.newUser.email != "" && this.newUser.password != ""){
             this.$http.post('users/add', this.newUser);
@@ -112,10 +160,12 @@ export default {
             this.failed = true;
             this.newUser.password = "";
           }
+
     },
     goToLogin(){
       this.$router.replace({ name: "login" });
-    }
+    },
+
   },
 }
 </script>
