@@ -21,7 +21,7 @@
 
   </div>
 
-  <md-dialog-alert
+  <md-dialog-alert class="error"
       :md-active.sync="failed"
       md-title="Coś poszło nie tak..."
       :md-content="failedText"
@@ -125,5 +125,9 @@ a {
 }
 .loading {
   margin-top: 20px;
+}
+.error {
+  border: 2px solid red !important;
+  border-radius: 10px;
 }
 </style>

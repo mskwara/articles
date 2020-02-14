@@ -7,14 +7,14 @@
       <form>
         <div class="form-row">
           <div class="col">
-            <input type="text" class="form-control" placeholder="Imię" v-model="newUser.name" required>
+            <input type="text" class="form-control" placeholder="Imię" v-model="newUser.name">
           </div>
           <div class="col">
-            <input type="text" class="form-control" placeholder="Nazwisko" v-model="newUser.surname" required>
+            <input type="text" class="form-control" placeholder="Nazwisko" v-model="newUser.surname">
           </div>
         </div>
         <div class="form-group">
-          <input type="email" class="form-control" placeholder="Email" v-model="newUser.email" required>
+          <input type="email" class="form-control" placeholder="Email" v-model="newUser.email">
         </div>
         <div class="form-group">
           <textarea type="text" class="form-control" placeholder="Opis" aria-describedby="descriptionHelp" v-model="newUser.description"></textarea>
@@ -33,7 +33,7 @@
         </div>
 
         <div class="form-group">
-          <input type="nick" class="form-control nickInput" placeholder="Nick" v-model="newUser.nick" aria-describedby="nickHelp" required>
+          <input type="nick" class="form-control nickInput" placeholder="Nick" v-model="newUser.nick" aria-describedby="nickHelp">
             <small id="nickHelp" class="form-text text-muted">Będzie Ci potrzeby do logowania</small>
         </div>
         <div class="form-group">
@@ -50,17 +50,22 @@
     </div>
   </div>
 
-  <md-dialog-alert
+  <md-dialog-alert class="success"
       :md-active.sync="success"
       md-title="Udało się!"
       md-content="Pomyślnie stworzono nowe konto. Przejdź do panelu logowania."
       md-confirm-text="Zamknij" />
-  <md-dialog-alert
+  <md-dialog-alert class="error"
       :md-active.sync="failed"
       md-title="Coś poszło nie tak..."
       md-content="Nie udało się zarejestrować. Sprawdź poprawność wszystkich pól."
       md-confirm-text="Zamknij" />
-  <md-dialog-alert
+  <md-dialog-alert class="error"
+      :md-active.sync="notUniqueNick"
+      md-title="Coś poszło nie tak..."
+      md-content="Ten nick jest już używany."
+      md-confirm-text="Zamknij" />
+  <md-dialog-alert class="error"
       :md-active.sync="imageError"
       md-title="Mamy problem..."
       :md-content="imageErrorText"
@@ -88,6 +93,7 @@ export default {
       },
       success: false,
       failed: false,
+      notUniqueNick: false,
       imageError: false,
       imageErrorText: "",
     }
@@ -146,15 +152,24 @@ export default {
       // axios.post('https://us-central1-oczymmyslisz-ad918.cloudfunctions.net/uploadFile ', formData)
       if(this.newUser.name != "" && this.newUser.surname != ""
        && this.newUser.nick != "" && this.newUser.email != "" && this.newUser.password != ""){
-            this.$http.post('users/add', this.newUser);
-            this.newUser.name = "";
-            this.newUser.surname = "";
-            this.newUser.nick = "";
-            this.newUser.description = "";
-            this.newUser.email = "";
-            this.newUser.password = "";
-            this.newUser.avatar = "";
-            this.success = true;
+            this.$http.post('validateUniqueNick', this.newUser).then(response => {
+              if(response.body == "true"){
+                this.$http.post('users/add', this.newUser);
+                this.newUser.name = "";
+                this.newUser.surname = "";
+                this.newUser.nick = "";
+                this.newUser.description = "";
+                this.newUser.email = "";
+                this.newUser.password = "";
+                this.newUser.avatar = "";
+                this.success = true;
+              }
+              else {
+                this.notUniqueNick = true;
+                this.newUser.nick = "";
+                this.newUser.password = "";
+              }
+            });
           }
           else {
             this.failed = true;
@@ -219,5 +234,13 @@ a {
 }
 .nickInput {
   margin-top: 20px;
+}
+.error {
+  border: 2px solid red !important;
+  border-radius: 10px;
+}
+.success {
+  border: 2px solid green !important;
+  border-radius: 10px;
 }
 </style>

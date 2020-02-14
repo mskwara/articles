@@ -355,6 +355,72 @@ $app->post('/api/validateLogin',
         //return $response->withJson($array);
     }
 );
+$app->post('/api/validateUniqueNick',
+    function (Request $request, Response $response, array $args) {
+        $servername = "serwer2001916.home.pl";
+        $username = "32213694_scoreboard";
+        $password = "Fell!Dell!=";
+        $dbname = "32213694_scoreboard";
+
+        $requestData = $request->getParsedBody();
+        // Create connection
+        $conn = new mysqli($servername, $username, $password, $dbname);
+        // Check connection
+        if ($conn->connect_error) {
+            die("Connection failed: " . $conn->connect_error);
+        }
+        $nick = $requestData['nick'];
+        $sql = "SELECT nick FROM users";
+        $result = $conn->query($sql);
+        $array = [];
+
+        if ($result->num_rows > 0) {
+            // output data of each row
+            while($row = $result->fetch_assoc()) {
+                if($row['nick'] == $nick) {
+                  return "false";
+                }
+            }
+
+        }
+        $conn->close();
+
+        return "true";
+    }
+);
+$app->post('/api/validateIfUserExists',
+    function (Request $request, Response $response, array $args) {
+        $servername = "serwer2001916.home.pl";
+        $username = "32213694_scoreboard";
+        $password = "Fell!Dell!=";
+        $dbname = "32213694_scoreboard";
+
+        $requestData = $request->getParsedBody();
+        // Create connection
+        $conn = new mysqli($servername, $username, $password, $dbname);
+        // Check connection
+        if ($conn->connect_error) {
+            die("Connection failed: " . $conn->connect_error);
+        }
+        $id = $requestData['id'];
+        $sql = "SELECT id FROM users";
+        $result = $conn->query($sql);
+        $array = [];
+
+        if ($result->num_rows > 0) {
+            // output data of each row
+            while($row = $result->fetch_assoc()) {
+                if($row['id'] == $id) {
+                  return "true";
+                }
+            }
+
+        }
+        $conn->close();
+
+        return "false";
+    }
+);
 $app->get('/api/articles/{id}/comments',
     function (Request $request, Response $response, array $args) {
         $servername = "serwer2001916.home.pl";
@@ -611,7 +677,6 @@ $app->post('/api/users/add',
 
 
       $encryptedPass = password_hash($requestData['password'], PASSWORD_DEFAULT);
-      echo $encryptedPass;
 
       $sql = "INSERT INTO users (nick, name, surname, email, description, password, avatar)
               VALUES('$requestData[nick]', '$requestData[name]', '$requestData[surname]',

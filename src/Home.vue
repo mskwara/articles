@@ -16,11 +16,38 @@
 import Navbar from './Navbar.vue'
 import LeftPanel from './LeftPanel.vue'
 import service from "./service.js";
+import { EventBus } from './event-bus.js';
 
 export default {
   name: 'home',
   components: {
     Navbar, LeftPanel
+  },
+  data(){
+    return {
+      checkingIfUserExists: null,
+    }
+  },
+  methods: {
+    checkIfUserExists(){
+      var user = {
+        id: service.id
+      }
+      this.$http.post('validateIfUserExists', user).then(response => {
+        if(response.body == "false"){
+          service.authenticated = false;    //logout
+          service.id = null;
+          service.nick = "";
+          service.name = "";
+          service.surname = "";
+          service.email = "";
+          service.description = "";
+          service.avatar = "";
+          clearInterval(this.checkingIfUserExists);
+          this.$router.replace({ name: "login" });
+        }
+      });
+    }
   },
   mounted(){
     if(!service.authenticated) {
@@ -28,7 +55,11 @@ export default {
     }
     else {
       this.$router.push({ name: "articles" });
+      this.checkingIfUserExists = setInterval(this.checkIfUserExists, 10000);
     }
+    EventBus.$on('logout', () => {
+      clearInterval(this.checkingIfUserExists);
+    });
   },
 }
 </script>

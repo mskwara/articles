@@ -58,6 +58,8 @@ export default {
       service.surname = "";
       service.email = "";
       service.description = "";
+      service.avatar = "";
+      EventBus.$emit('logout');
       this.$router.replace({ name: "login" });
     },
     search(){

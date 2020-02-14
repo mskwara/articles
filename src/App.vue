@@ -14,10 +14,6 @@ export default {
   data(){
     return {
       authenticated: false,
-      mockAccount: {
-          email: "a@b.c",
-          password: "pass"
-      }
     }
   },
   mounted(){
@@ -34,7 +30,8 @@ export default {
       },
       logout() {
           this.authenticated = false;
-      }
+      },
+
   }
 }
 </script>
