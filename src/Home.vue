@@ -83,10 +83,11 @@ body {
   margin-top: 60px;
 }
 .left {
-  width: 300px;
+  width: 250px;
 }
 .right {
   padding: 50px;
+  padding-top: 20px;
   flex: 1;
 }
 </style>

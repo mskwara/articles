@@ -10,7 +10,7 @@
           <img v-else src="./assets/avatar.png" class="mr-3 avatar">
           <div class="averageRating" v-if="articleRating != null">
             <h3 class="avg">{{averageRating}}</h3>
-            <star-rating class="avgRating" v-model="averageRating" read-only="true" :increment="0.01" :star-size="20" :show-rating="false"
+            <star-rating class="avgRating" :rating="parseFloat(averageRating)" read-only="true" :increment="0.01" :star-size="20" :show-rating="false"
                :border-width="4" border-color="#d8d8d8" :rounded-corners="true"
                :star-points="[23,2, 14,17, 0,19, 10,34, 7,50, 23,43, 38,50, 36,34, 46,19, 31,17]"></star-rating>
             <h6 class="avgCount" v-if="articleRating.count > 1">Na podstawie opinii {{articleRating.count}} osób</h6>
@@ -25,7 +25,8 @@
           </div>
           <p>{{article.content}}</p>
           <div class="bottom">
-            <star-rating v-if="article.userId != getLoggedUserId()" class="rating" v-model="myRate.rating" @rating-selected="setRating" :star-size="30" :show-rating="false"
+            <star-rating v-if="article.userId != getLoggedUserId()" class="rating" v-model="myRate.rating" @rating-selected="setRating"
+              :star-size="30" :show-rating="false"
                :border-width="4" border-color="#d8d8d8" :rounded-corners="true"
                :star-points="[23,2, 14,17, 0,19, 10,34, 7,50, 23,43, 38,50, 36,34, 46,19, 31,17]"></star-rating>
           </div>
@@ -37,7 +38,8 @@
 
           <ul class="list-group">
             <li class="list-group-item" :key="comment.id" v-for="comment in comments">
-              <img v-if="getCommentImage(comment).length > 0" :src="getCommentImage(comment)" class="mr-3 commentAvatar">
+              <img v-if="getCommentImage(comment.userId).length > 0" :src="getCommentImage(comment.userId)" class="mr-3 commentAvatar">
+
               <img v-else src="./assets/avatar.png" class="mr-3 commentAvatar">
               <div class="comContent">
                 <h6>
@@ -135,16 +137,27 @@ export default {
         if(response.body != null)  this.comments = response.body;
         else this.comments = [];
 
-        for(var i = 0 ; i < this.comments.length ; i++){
-          var obj = this.comments[i];
-          this.$http.get('users/'+this.comments[i].userId+'/avatar').then(response => {
-            this.commentsAvatars.push({
-              id: obj.id,
-              avatar: response.body[0].avatar
-            });
-          });
-
+        var obj = {
+          userIds: []
+        };
+        var isAssigned = false;
+        for(var i = 0 ; i < this.comments.length ; i++){  //dla każdego komentarza
+          isAssigned = false;
+          for(var j = 0 ; j < obj.userIds.length ; j++){
+            if(this.comments[i].userId == obj.userIds[j]){  //jeśli jest juz user w tablicy to pomiń
+              isAssigned = true;
+              break;
+            }
+          }
+          if(isAssigned == false){    //a jak nie to wpisz go
+            obj.userIds.push(this.comments[i].userId);
+          }
         }
+        this.$http.post('users/avatars-needed', obj).then(response => {
+          this.commentsAvatars = response.body;
+        });
+
+
         this.loadingNewComment = false;
       });
     },
@@ -224,9 +237,9 @@ export default {
         });
       }
     },
-    getCommentImage(comment){
+    getCommentImage(userId){
       for(var i = 0 ; i < this.commentsAvatars.length ; i++){
-        if(this.commentsAvatars[i].id == comment.id){
+        if(this.commentsAvatars[i].id == userId){
           return this.commentsAvatars[i].avatar;
         }
       }
@@ -258,7 +271,7 @@ export default {
     });
 
     this.getComments();
-    this.getCommentsInterval = setInterval(this.getComments, 5000);
+    this.getCommentsInterval = setInterval(this.getComments, 10000);
     this.$http.get('users/'+service.id+"/likes").then(response => {
       if(response.body != null){
         this.loggedUserLikes = response.body;
@@ -300,6 +313,7 @@ h6 {
 .avatar {
   border-radius: 200px;
   width: 200px;
+  min-width: 70px;
   margin: 0 !important;
 }
 .commentAvatar {

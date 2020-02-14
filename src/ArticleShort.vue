@@ -1,12 +1,12 @@
 <template>
-  <div id="article">
+  <div id="articleName">
     <div class="media">
       <img v-if="image.length > 0" :src="image" class="mr-3 avatar">
       <img v-else src="./assets/avatar.png" class="mr-3 avatar">
       <div class="media-body">
         <div class="header">
           <h2 class="mt-0">{{article.title}}</h2>
-          <star-rating v-if="article.rating != 0.0" class="avgRating" v-model="article.rating" read-only="true"
+          <star-rating v-if="article.rating != 0.0" class="avgRating" :rating="parseFloat(article.rating)" :read-only="true"
             :increment="0.01" :star-size="20" :show-rating="false"
              :border-width="4" border-color="#d8d8d8" :rounded-corners="true"
              :star-points="[23,2, 14,17, 0,19, 10,34, 7,50, 23,43, 38,50, 36,34, 46,19, 31,17]"></star-rating>
@@ -28,7 +28,7 @@
 <script>
 
 export default {
-  name: 'article',
+  name: 'articleName',
   components: {
   },
   props: {
@@ -62,7 +62,7 @@ export default {
 </script>
 
 <style scoped>
-#article {
+#articleName {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

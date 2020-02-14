@@ -6,10 +6,10 @@
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav mr-auto">
         <li class="nav-item">
-          <router-link class="nav-link routerlink" to="/articles">Przegląd</router-link>
+          <a class="nav-link routerlink" @click="routePrzeglad()">Przegląd</a>
         </li>
         <li class="nav-item">
-          <router-link class="nav-link routerlink" to="/myarticles">Moje artykuły</router-link>
+          <a class="nav-link routerlink" @click="routeOnlyMyArticles()">Moje artykuły</a>
         </li>
         <li class="nav-item">
           <router-link class="nav-link routerlink" to="/profile">
@@ -19,7 +19,7 @@
           </router-link>
         </li>
         <li class="nav-item">
-          <button class="btn btn-outline-success write" @click="setRoute('/writing')">Napisz artykuł</button>
+          <button class="btn btn-outline-success write" @click="setRoute('writing')">Napisz artykuł</button>
         </li>
       </ul>
       <a class="nav-link logout" @click="logout()">Wyloguj</a>
@@ -44,11 +44,13 @@ export default {
       username: "",
       searchPhrase: "",
       image: "",
+      onlyMyArticles: false,
     }
   },
   methods: {
     setRoute(link){
-      this.$router.push(link);
+      //this.$router.push(link);
+      this.$router.push({ name: link});
     },
     logout(){
       service.authenticated = false;
@@ -65,6 +67,16 @@ export default {
     search(){
       this.$router.push({ name: 'articlessearched', params: { phrase: this.searchPhrase }});
       this.searchPhrase = "";
+    },
+    routeOnlyMyArticles(){
+      this.onlyMyArticles = true;
+      this.$router.push({ name: 'articles', params: { onlyMyArticles: this.onlyMyArticles }});
+      EventBus.$emit('only-my-articles');
+    },
+    routePrzeglad(){
+      this.onlyMyArticles = false;
+      this.$router.push({ name: 'articles', params: { onlyMyArticles: this.onlyMyArticles }});
+      EventBus.$emit('all-articles');
     }
   },
   mounted(){
@@ -73,7 +85,6 @@ export default {
 
     EventBus.$on('update-user', () => {
       this.image = service.avatar;
-
     });
   }
 }
@@ -93,6 +104,7 @@ export default {
 }
 .avatar {
   width: 30px;
+  min-width: 30px;
   border-radius: 50px;
   margin-right: 10px;
 }
@@ -124,5 +136,8 @@ export default {
 }
 .navbar-brand {
   outline: 0;
+}
+a {
+  cursor: pointer;
 }
 </style>

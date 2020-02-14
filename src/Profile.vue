@@ -27,7 +27,7 @@
             Dodaj nieco świeżości i zaktualizuj swoje zdjęcie!<br>
             - Zdjęcie musi być kwadratowe o rozmiarze 200x200 px<br>
             - Maksymalny rozmiar to 200KB
-            <a href="http://download940.mediafire.com/1y6t0gkfu9ug/52p54otq7ls8fak/photo_upload_instruction.pdf">Nie wiesz jak przyciąć i zmniejszyć zdjęcie?</a>
+            <a href="http://download940.mediafire.com/1y6t0gkfu9ug/52p54otq7ls8fak/photo_upload_instruction.pdf" target="_blank">Nie wiesz jak przyciąć i zmniejszyć zdjęcie?</a>
           </small>
           <label class="custom-file-label">Wybierz zdjęcie</label>
         </div>
@@ -37,11 +37,10 @@
             <small id="nickHelp" class="form-text text-muted">Ustalonego przy rejestracji nicku nie można już zmienić...</small>
         </div>
         <div class="form-group pass">
-          <input type="password" class="form-control" placeholder="Bieżące hasło" v-model="user.password">
-          <button class="btn btn-warning chPass" data-toggle="changePasswordDialog">Zmień hasło</button>
+          <input type="password" class="form-control" placeholder="Nowe hasło" v-model="user.newPassword">
         </div>
         <div class="buttons">
-          <button type="submit" class="btn btn-primary" @click="update()">Zaktualizuj dane</button>
+          <button type="submit" class="btn btn-primary" @click="applying = true">Zaktualizuj dane</button>
         </div>
       </form>
     </div>
@@ -50,12 +49,21 @@
     </div>
   </div>
 
-  <md-dialog-alert
+  <md-dialog-prompt
+      :md-active.sync="applying"
+      v-model="user.password"
+      md-title="Podaj hasło by zatwierdzić zmiany"
+      md-input-maxlength="30"
+      md-input-placeholder="Hasło"
+      md-confirm-text="Zatwierdź"
+      @md-confirm="update" />
+
+  <md-dialog-alert class="success"
       :md-active.sync="success"
       md-title="Udało się!"
       md-content="Pomyślnie zaktualizowano Twój profil!"
       md-confirm-text="Zamknij" />
-  <md-dialog-alert
+  <md-dialog-alert class="error"
       :md-active.sync="failed"
       md-title="Coś poszło nie tak..."
       md-content="Sprawdź poprawność wszystkich pól."
@@ -84,11 +92,13 @@ export default {
         description: "",
         email: "",
         password: "",
+        newPassword: "",
         avatar: "",
       },
       success: false,
       failed: false,
       changePasswordDialog: false,
+      applying: false,
     }
   },
   mounted(){
@@ -111,7 +121,7 @@ export default {
       }
     },
     update(){
-      if(this.user.email != "" && this.user.password != ""){
+      if(this.user.email != "" && this.password != ""){
         this.$http.post('validateLogin', this.user).then(response => {
           if(response.body == "true"){
             this.$http.put('users/update', this.user);
@@ -119,6 +129,7 @@ export default {
             service.email = this.user.email;
             service.description = this.user.description;
             service.avatar = this.user.avatar;
+            this.user.password = "";
             this.success = true;
             EventBus.$emit('update-user');
           }
@@ -201,5 +212,13 @@ a {
 .chPass {
   width: 170px;
   margin-left: 20px;
+}
+.error {
+  border: 2px solid red !important;
+  border-radius: 10px;
+}
+.success {
+  border: 2px solid green !important;
+  border-radius: 10px;
 }
 </style>

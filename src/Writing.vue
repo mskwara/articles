@@ -3,33 +3,45 @@
     <h3>Napisz nowy artykuł</h3>
     <form>
       <div class="form-group">
-        <label for="title">Tytuł artykułu</label>
-        <input type="text" class="form-control" id="title" aria-describedby="titleHelp" v-model="article.title">
+        <input type="text" class="form-control" id="title" aria-describedby="titleHelp" v-model="article.title" placeholder="Tytuł">
         <small id="titleHelp" class="form-text text-muted">Podaj chwytny tytuł, który zaciekawi odbiorców.</small>
       </div>
       <div class="form-group">
         <label for="category">Kategoria</label>
-        <select class="form-control" id="category" aria-describedby="category" v-model="article.category">
-          <option :key="cat.key" v-for="cat in tags">{{cat.label}}</option>
+        <select class="custom-select" id="category" aria-describedby="category" v-model="article.category">
+          <option :key="cat.key" v-for="cat in categories">{{cat.label}}</option>
         </select>
         <small id="category" class="form-text text-muted">Wybierz kategorię, do której można zaliczyć twój tekst</small>
       </div>
+      <div class="form-group select">
+        <label for="category">Styl</label>
+        <select class="custom-select" aria-describedby="writingStyle" v-model="article.style">
+          <option :key="style.key" v-for="style in writing_styles">{{style.label}}</option>
+        </select>
+        <small id="writingStyle" class="form-text text-muted">Wybierz styl, w jakim będzie napisany ten artykuł</small>
+      </div>
       <div class="form-group">
-        <label for="content">Treść</label>
-        <textarea class="form-control" id="content" rows="7" v-model="article.content"></textarea>
+        <textarea class="form-control" id="content" rows="7" v-model="article.content" placeholder="Treść artykułu"></textarea>
       </div>
       <button type="button" class="btn btn-primary publish" @click="publish()">Opublikuj</button>
     </form>
 
-    <md-dialog-alert
+    <md-dialog-alert class="success"
       :md-active.sync="published"
       md-title="Opublikowano artykuł"
       :md-content="alertText" />
+
+    <md-dialog-alert class="error"
+        :md-active.sync="failed"
+        md-title="Coś poszło nie tak..."
+        md-content="Wypełnij wszystkie pola przed publikacją!"
+        md-confirm-text="Zamknij" />
   </div>
 </template>
 
 <script>
 import categories from "./categories.js";
+import writing_styles from "./writing_styles.js";
 import service from "./service.js";
 
 export default {
@@ -38,35 +50,51 @@ export default {
   },
   data(){
     return {
-      tags: categories.categories,
+      categories: categories.categories,
+      writing_styles: writing_styles.writing_styles,
       article: {
         title: "",
         category: "",
+        style: "",
         content: "",
         userId: 0,
       },
       published: false,
-      alertText: ""
+      alertText: "",
+      failed: false
     }
   },
   mounted(){
-    this.article.category = this.tags[0].label;
+    this.article.category = this.categories[0].label;
+    this.article.style = this.writing_styles[0].label;
   },
   methods: {
     publish(){
-      this.article.userId = service.id;
-      for(var i = 0 ; i < this.tags.length ; i++){
-        if(this.tags[i].label == this.article.category){
-          this.article.category = this.tags[i].key;
-          break;
+      if(this.article.title != "" && this.article.category != "" && this.article.style != "" && this.article.content != ""){
+        this.article.userId = service.id;
+        for(var i = 0 ; i < this.categories.length ; i++){
+          if(this.categories[i].label == this.article.category){    //zamiana z label na key
+            this.article.category = this.categories[i].key;
+            break;
+          }
         }
+        for(var j = 0 ; j < this.writing_styles.length ; j++){
+          if(this.writing_styles[j].label == this.article.style){
+            this.article.style = this.writing_styles[j].key;
+            break;
+          }
+        }
+        this.$http.post('articles/add', this.article);
+        this.article.category = this.categories[0].label;
+        this.article.style = this.writing_styles[0].label;
+        this.article.content = "";
+        this.alertText = "Twój artykuł <strong>"+this.article.title+"</strong> został pomyślnie opublikowany!."
+        this.article.title = "";
+        this.published = true;
       }
-      this.$http.post('articles/add', this.article);
-      this.article.category = this.tags[0].label;
-      this.article.content = "";
-      this.alertText = "Twój artykuł <strong>"+this.article.title+"</strong> został pomyślnie opublikowany!."
-      this.article.title = "";
-      this.published = true;
+      else {
+        this.failed = true;
+      }
     }
   },
 }
@@ -78,5 +106,13 @@ export default {
 }
 h3 {
   margin-bottom: 20px;
+}
+.error {
+  border: 2px solid red !important;
+  border-radius: 10px;
+}
+.success {
+  border: 2px solid green !important;
+  border-radius: 10px;
 }
 </style>

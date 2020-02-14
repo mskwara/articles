@@ -5,18 +5,38 @@
       <h4 class="header">Kategorie</h4>
       <ul class="nav flex-column">
         <li class="nav-item">
-          <a class="nav-link active" @click="goToArticles()">All</a>
+          <a class="nav-link" @click="setCategory('')">Wszystkie</a>
         </li>
         <li class="nav-item" :key="cat.key" v-for="cat in categories">
-          <a class="nav-link active"  @click="setRoute(cat.key)">{{cat.label}}</a>
+          <a class="nav-link"  @click="setCategory(cat.key)">{{cat.label}}</a>
         </li>
       </ul>
+
+      <h4 class="header">Style</h4>
+      <div class="checkboxes">
+        <div class="custom-control custom-checkbox">
+          <input type="checkbox" class="custom-control-input" id="loose" checked="true" v-model="filter.loose" @click="changeStyle('loose')">
+          <label class="custom-control-label cb" for="loose">Luźny</label>
+        </div>
+        <div class="custom-control custom-checkbox">
+          <input type="checkbox" class="custom-control-input" id="serious" checked="true" v-model="filter.serious" @click="changeStyle('serious')">
+          <label class="custom-control-label cb" for="serious">Poważny</label>
+        </div>
+        <div class="custom-control custom-checkbox">
+          <input type="checkbox" class="custom-control-input" id="funny" checked="true" v-model="filter.funny" @click="changeStyle('funny')">
+          <label class="custom-control-label cb" for="funny">Śmieszny</label>
+        </div>
+      </div>
+
+      <a class="reset" @click="resetFilters()">Resetuj filtry</a>
+
     </div>
   </div>
 </template>
 
 <script>
 import categories from "./categories.js";
+import { EventBus } from './event-bus.js';
 
 export default {
   name: 'navbar',
@@ -26,15 +46,49 @@ export default {
   data(){
     return {
       categories: categories.categories,
+      filter: {
+        category: "",
+        loose: true,
+        serious: true,
+        funny: true,
+      }
     }
   },
   methods: {
     goToArticles(){
       this.$router.push({name: 'articles'});
     },
-    setRoute(key){
-      this.$router.push({ name: 'articlesfiltered', params: { category: key }});
+    setCategory(key){
+      //this.$router.push({ name: 'articlesfiltered', params: { category: key }});
+      this.filter.category = key;
+      EventBus.$emit('filter', this.filter);
     },
+    changeStyle(cb){
+      //this.$router.push({ name: 'articlesfiltered', params: { category: key }});
+      if(cb == "loose") {
+        this.filter.loose = !this.filter.loose;
+      }
+      if(cb == "serious") {
+        this.filter.serious = !this.filter.serious;
+      }
+      if(cb == "funny") {
+        this.filter.funny = !this.filter.funny;
+      }
+
+      EventBus.$emit('filter', this.filter);
+    },
+    resetFilters(){
+      this.filter.category = "";
+      this.filter.loose = true;
+      this.filter.serious = true;
+      this.filter.funny = true;
+      EventBus.$emit('filter', this.filter);
+    }
+  },
+  mounted(){
+    EventBus.$on('give-me-filters', () => {
+      EventBus.$emit('filter', this.filter);
+    });
   }
 }
 </script>
@@ -50,8 +104,8 @@ color: #2c3e50;
 overflow: hidden;
 }
 .leftPanel {
-  width: 300px;
-  min-width: 300px;
+  width: 250px;
+  min-width: 200px;
   height: 100vh;
   border-right: 1px solid gray;
   background-color: #fafafa;
@@ -63,5 +117,23 @@ overflow: hidden;
 }
 a {
   cursor: pointer;
+}
+.custom-checkbox {
+  margin-left: 20px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-top: 5px;
+}
+.cb {
+  padding-top: 3px;
+}
+.reset {
+  font-size: 9pt;
+  text-align: center !important;
+  margin-left: 60px;
+}
+.checkboxes {
+  margin-bottom: 20px;
 }
 </style>

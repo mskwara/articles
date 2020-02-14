@@ -314,6 +314,37 @@ $app->get('/api/users/{id}/avatar',
         return $response->withJson($array);
     }
 );
+$app->post('/api/users/avatars-needed',
+    function (Request $request, Response $response, array $args) {
+        $servername = "serwer2001916.home.pl";
+        $username = "32213694_scoreboard";
+        $password = "Fell!Dell!=";
+        $dbname = "32213694_scoreboard";
+
+        // Create connection
+        $conn = new mysqli($servername, $username, $password, $dbname);
+        // Check connection
+        if ($conn->connect_error) {
+            die("Connection failed: " . $conn->connect_error);
+        }
+        $requestData = $request->getParsedBody();
+        $userIds = $requestData['userIds'];
+        $sql = 'SELECT id, avatar FROM users WHERE id IN (' . implode(',', array_map('intval', $userIds)) . ')';
+        $result = $conn->query($sql);
+        $array = [];
+
+        if ($result->num_rows > 0) {
+            // output data of each row
+            while($row = $result->fetch_assoc()) {
+                $array[] = $row;
+            }
+        } else {
+            echo "0 results";
+        }
+        $conn->close();
+        return $response->withJson($array);
+    }
+);
 $app->post('/api/validateLogin',
     function (Request $request, Response $response, array $args) {
         $servername = "serwer2001916.home.pl";
@@ -646,7 +677,7 @@ $app->post('/api/articles/add',
           die("Connection failed: " . $conn->connect_error);
       }
 
-      $sql = "INSERT INTO articles (title, tag, content, userId) VALUES('$requestData[title]', '$requestData[category]', '$requestData[content]', '$requestData[userId]')";
+      $sql = "INSERT INTO articles (title, tag, style, content, userId) VALUES('$requestData[title]', '$requestData[category]', '$requestData[style]', '$requestData[content]', '$requestData[userId]')";
 
       if ($conn->query($sql) === TRUE) {
           echo "New record created successfully";
@@ -713,7 +744,14 @@ $app->put('/api/users/update',
       $description = $requestData['description'];
       $nick = $requestData['nick'];
       $avatar = $requestData['avatar'];
-      $sql = "UPDATE users SET email = \"$email\", description = \"$description\", avatar = \"$avatar\" WHERE nick = \"$nick\"";
+      $encryptedPass = password_hash($requestData['newPassword'], PASSWORD_DEFAULT);
+      if($requestData['newPassword'] != ""){
+        $sql = "UPDATE users SET email = \"$email\", description = \"$description\", avatar = \"$avatar\", password = \"$encryptedPass\" WHERE nick = \"$nick\"";
+      }
+      else {
+        $sql = "UPDATE users SET email = \"$email\", description = \"$description\", avatar = \"$avatar\" WHERE nick = \"$nick\"";
+      }
+
 
       if ($conn->query($sql) === TRUE) {
           echo "New record created successfully";

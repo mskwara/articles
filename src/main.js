@@ -2,7 +2,7 @@ import Vue from 'vue'
 import App from './App.vue'
 import Home from './Home.vue'
 import Articles from './Articles.vue'
-import MyArticles from './MyArticles.vue'
+// import MyArticles from './MyArticles.vue'
 import ArticlesFiltered from './ArticlesFiltered.vue'
 import ArticlesSearched from './ArticlesSearched.vue'
 import ArticleMain from './ArticleMain.vue'
@@ -38,8 +38,8 @@ const router = new VueRouter({
     { path: '/', name: "app", component: App },
     { path: '/home', name: 'home', component: Home,
       children: [
-        { path: '/articles', name: 'articles', component: Articles },
-        { path: '/myarticles', name: 'myarticles', component: MyArticles },
+        { path: '/articles', name: 'articles', component: Articles, params: true },
+        //{ path: '/myarticles', name: 'myarticles', component: MyArticles },
         { path: '/articles/:category', name: 'articlesfiltered', component: ArticlesFiltered, params: true},
         { path: '/articles/search/:phrase', name: 'articlessearched', component: ArticlesSearched, params: true},
         { path: '/article/:id', name: 'article', component: ArticleMain, params: true },

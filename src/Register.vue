@@ -27,7 +27,7 @@
             Wraz ze zdjęciem twoje artykuły będą prezentować się znacznie lepiej!<br>
             - Zdjęcie musi być kwadratowe o rozmiarze 200x200 px<br>
             - Maksymalny rozmiar to 200KB
-            <a href="http://download940.mediafire.com/1y6t0gkfu9ug/52p54otq7ls8fak/photo_upload_instruction.pdf">Nie wiesz jak przyciąć i zmniejszyć zdjęcie?</a>
+            <a href="http://download940.mediafire.com/1y6t0gkfu9ug/52p54otq7ls8fak/photo_upload_instruction.pdf" target="_blank">Nie wiesz jak przyciąć i zmniejszyć zdjęcie?</a>
           </small>
           <label class="custom-file-label">Wybierz zdjęcie</label>
         </div>
