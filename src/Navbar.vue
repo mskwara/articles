@@ -12,6 +12,9 @@
           <a class="nav-link routerlink" @click="routeOnlyMyArticles()">Moje artykuły</a>
         </li>
         <li class="nav-item">
+          <a class="nav-link routerlink" @click="setRoute('statistics')">Statystyki</a>
+        </li>
+        <li class="nav-item">
           <router-link class="nav-link routerlink" to="/profile">
             <img v-if="image.length > 0" class="avatar" :src="image" />
             <img v-else src="./assets/avatar.png" class="mr-3 avatar">

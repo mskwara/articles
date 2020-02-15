@@ -1,8 +1,6 @@
 <template>
   <div id="articlesName">
-    <div class="spinner-border text-primary" role="status" v-if="loading">
-      <span class="sr-only">Loading...</span>
-    </div>
+
     <div class="chips">
       <md-chip class="md-accent chip" v-if="filter.category != ''">{{ getLabelForCategory(filter.category) }}</md-chip>
       <md-chip class="md-accent chip" v-else>Wszystkie</md-chip>
@@ -10,13 +8,19 @@
         <md-chip class="md-primary chip" v-if="style.value == true">{{ getLabelForStyle(style.key) }}</md-chip>
       </div>
     </div>
+    <div class="spinner-border text-primary" role="status" v-if="loading">
+      <span class="sr-only">Loading...</span>
+    </div>
     <div v-if="articles.length > 0">
       <div class="article" :key="article.id" v-for="article in articlesFiltered">
         <article-short :article="article"></article-short>
       </div>
     </div>
-    <div v-if="articlesFiltered.length == 0 && !loading">
+    <div v-if="articlesFiltered.length == 0 && !loading && !onlyMyArticles">
       Nikt nie napisał jeszcze żadnego artykułu o wybranych kryteriach.
+    </div>
+    <div v-if="articlesFiltered.length == 0 && !loading && onlyMyArticles">
+      Nie napisałeś jeszcze żadnego artykułu o wybranych kryteriach.
     </div>
 
   </div>
@@ -158,6 +162,7 @@ export default {
   display: flex;
   flex-direction: column;
   justify-content: center;
+  align-items: center;
 }
 .article {
   margin-bottom: 30px;

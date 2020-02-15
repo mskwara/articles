@@ -133,6 +133,110 @@ $app->get('/api/users/{userId}/articles',
         return $response->withJson($array);
     }
 );
+$app->get('/api/users/{userId}/articles/statistics',
+    function (Request $request, Response $response, array $args) {
+        $servername = "serwer2001916.home.pl";
+        $username = "32213694_scoreboard";
+        $password = "Fell!Dell!=";
+        $dbname = "32213694_scoreboard";
+        // Create connection
+        $conn = new mysqli($servername, $username, $password, $dbname);
+        // Check connection
+        if ($conn->connect_error) {
+            die("Connection failed: " . $conn->connect_error);
+        }
+
+        $userId = $args['userId'];
+        $sql = "SELECT id FROM articles WHERE userId = $userId";    //biore wszystkie id artykułów tego usera
+        $result = $conn->query($sql);
+        $articlesIds = [];
+
+        $numberOfArticles = 0;
+        if ($result->num_rows > 0) {
+            while($row = $result->fetch_assoc()) {
+                $articlesIds[] = $row['id'];    //wpisuję id artykułów do tablicy
+                $numberOfArticles = $numberOfArticles + 1;
+            }
+        }
+
+        $r1 = 0;
+        $r2 = 0;
+        $r3 = 0;
+        $r4 = 0;
+        $r5 = 0;
+
+        for($i = 0 ; $i < $numberOfArticles ; $i = $i+1){
+          $currArtId = $articlesIds[$i];
+          $sql1 = "SELECT rating FROM rating WHERE articleId = $currArtId";    //biore wszystkie oceny tego artykulu
+          $result1 = $conn->query($sql1);
+
+          if ($result1->num_rows > 0) {
+              while($row = $result1->fetch_assoc()) {
+                  if($row['rating'] == 1)   $r1 = $r1 + 1;
+                  else if($row['rating'] == 2)   $r2 = $r2 + 1;
+                  else if($row['rating'] == 3)   $r3 = $r3 + 1;
+                  else if($row['rating'] == 4)   $r4 = $r4 + 1;
+                  else if($row['rating'] == 5)   $r5 = $r5 + 1;
+              }
+          }
+        }
+        $rate1 = ['id' => 1, 'count' => $r1];   //ile jest poszczególnych ocen
+        $rate2 = ['id' => 2, 'count' => $r2];
+        $rate3 = ['id' => 3, 'count' => $r3];
+        $rate4 = ['id' => 4, 'count' => $r4];
+        $rate5 = ['id' => 5, 'count' => $r5];
+        $rates = [];
+        $rates[] = $rate5;
+        $rates[] = $rate4;
+        $rates[] = $rate3;
+        $rates[] = $rate2;
+        $rates[] = $rate1;
+
+
+        $sql2 = "SELECT id FROM articles";    //ile jest wszystkich artykułów
+        $result2 = $conn->query($sql2);
+        $allArticles = 0;
+        if ($result2->num_rows > 0) {
+            while($row = $result2->fetch_assoc()) {
+                $allArticles = $allArticles + 1;
+            }
+        }
+        $articles = ['yourArticles' => $numberOfArticles, 'allArticles' => $allArticles];
+
+        $sql3 = "SELECT id FROM comments WHERE userId = $userId";    //ile jest twoich komentarzy
+        $result3 = $conn->query($sql3);
+        $yourComments = 0;
+        if ($result3->num_rows > 0) {
+            while($row = $result3->fetch_assoc()) {
+                $yourComments = $yourComments + 1;
+            }
+        }
+
+        $sql4 = "SELECT id FROM comments";    //ile jest wszystkich komentarzy
+        $result4 = $conn->query($sql4);
+        $allComments = 0;
+        if ($result4->num_rows > 0) {
+            while($row = $result4->fetch_assoc()) {
+                $allComments = $allComments + 1;
+            }
+        }
+        $comments = ['yourComments' => $yourComments, 'allComments' => $allComments];
+
+        $sql5 = "SELECT id FROM rating WHERE userId = $userId";    //ile jest twoich opinii
+        $result5 = $conn->query($sql5);
+        $yourRatings = 0;
+        if ($result5->num_rows > 0) {
+            while($row = $result5->fetch_assoc()) {
+                $yourRatings = $yourRatings + 1;
+            }
+        }
+
+        $array = ['rating' => $rates, 'articles' => $articles, 'comments' => $comments, 'yourRatings' => $yourRatings];
+
+        $conn->close();
+        return $response->withJson($array);
+    }
+);
 $app->get('/api/articles/category/{category}',
     function (Request $request, Response $response, array $args) {
         $servername = "serwer2001916.home.pl";

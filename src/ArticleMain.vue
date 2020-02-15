@@ -24,6 +24,7 @@
             <h6>{{transformDate(article.date)}}</h6>
           </div>
           <p>{{article.content}}</p>
+          <p class="podpis">{{user.name}} {{user.surname}}</p>
           <div class="bottom">
             <star-rating v-if="article.userId != getLoggedUserId()" class="rating" v-model="myRate.rating" @rating-selected="setRating"
               :star-size="30" :show-rating="false"
@@ -118,6 +119,7 @@ export default {
       averageRating: null,
       image: "",
       commentsAvatars: [],
+      user: {}
     }
   },
   methods: {
@@ -256,6 +258,10 @@ export default {
       this.getAverageRating();
       this.$http.get('users/'+this.article.userId+'/avatar').then(response => {
         this.image = response.body[0].avatar;
+      });
+
+      this.$http.get('users/short/'+this.article.userId).then(response => {
+        this.user = response.body[0];
       });
     });
     this.myRate.userId = service.id;
@@ -419,5 +425,11 @@ button {
   margin: 0;
   font-size: 9pt;
   font-style: italic;
+}
+.podpis {
+  text-align: right;
+  font-style: italic;
+  font-size: 10pt;
+  padding-right: 20px;
 }
 </style>
