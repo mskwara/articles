@@ -69,6 +69,12 @@
       md-content="Sprawdź poprawność wszystkich pól."
       md-confirm-text="Zamknij" />
 
+  <md-dialog-alert class="error"
+      :md-active.sync="imageError"
+      md-title="Mamy problem..."
+      :md-content="imageErrorText"
+      md-confirm-text="Zamknij" />
+
 
 
 
@@ -99,6 +105,7 @@ export default {
       failed: false,
       changePasswordDialog: false,
       applying: false,
+      imageError: false,
     }
   },
   mounted(){
@@ -111,14 +118,47 @@ export default {
   },
   methods: {
     onFileChange(event) {
+      //this.newUser.avatar = event.target.files[0];  //do firebase
+      const file = event.target.files[0];
+      if(!file || file.type.indexOf('image/') !== 0){ //zły format pliku
+        event.preventDefault();
+        this.imageErrorText = "Wybrałeś nieprawidłowy format pliku!";
+        this.imageError = true;
+        return;
+      }
+
+      let reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = evt => {
+        let img = new Image();
+        img.onload = () => {
+          if(img.width != 200 || img.height != 200){    //czy ma wymiary 200x200
+            event.preventDefault();
+            this.imageErrorText = "Avatar musi mieć wymiary 200x200 px!";
+            this.imageError = true;
+            return;
+          }
+        }
+        img.src = evt.target.result;
+      }
+
+
+      if (file.size > 1024 * 200) {    //czy rozmiar < 200 KB
+        event.preventDefault();
+        this.imageErrorText = "Plik ma zbyt duży rozmiar! Maksymalny dopuszczalny to 200KB.";
+        this.imageError = true;
+        return;
+      }
+
       var input = event.target;
       if (input.files && input.files[0]) {
-          var reader = new FileReader();
+          reader = new FileReader();
           reader.onload = (e) => {
-              this.user.avatar = e.target.result;
+              this.newUser.avatar = e.target.result;
           }
           reader.readAsDataURL(input.files[0]);
       }
+
     },
     update(){
       if(this.user.email != "" && this.password != ""){

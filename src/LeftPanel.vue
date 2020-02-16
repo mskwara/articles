@@ -117,6 +117,7 @@ overflow: hidden;
 }
 a {
   cursor: pointer;
+  padding-bottom: 0 !important;
 }
 .custom-checkbox {
   margin-left: 20px;

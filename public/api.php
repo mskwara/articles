@@ -103,36 +103,6 @@ $app->get('/api/articles/{articleId}/averageRating',
         return $response->withJson($wynik);
     }
 );
-$app->get('/api/users/{userId}/articles',
-    function (Request $request, Response $response, array $args) {
-        $servername = "serwer2001916.home.pl";
-        $username = "32213694_scoreboard";
-        $password = "Fell!Dell!=";
-        $dbname = "32213694_scoreboard";
-        // Create connection
-        $conn = new mysqli($servername, $username, $password, $dbname);
-        // Check connection
-        if ($conn->connect_error) {
-            die("Connection failed: " . $conn->connect_error);
-        }
-
-        $userId = $args['userId'];
-        $sql = "SELECT * FROM articles WHERE userId = $userId ORDER BY id DESC";
-        $result = $conn->query($sql);
-        $array = [];
-
-        if ($result->num_rows > 0) {
-            // output data of each row
-            while($row = $result->fetch_assoc()) {
-                $array[] = $row;
-            }
-        } else {
-            echo "0 results";
-        }
-        $conn->close();
-        return $response->withJson($array);
-    }
-);
 $app->get('/api/users/{userId}/articles/statistics',
     function (Request $request, Response $response, array $args) {
         $servername = "serwer2001916.home.pl";
@@ -237,36 +207,6 @@ $app->get('/api/users/{userId}/articles/statistics',
         return $response->withJson($array);
     }
 );
-$app->get('/api/articles/category/{category}',
-    function (Request $request, Response $response, array $args) {
-        $servername = "serwer2001916.home.pl";
-        $username = "32213694_scoreboard";
-        $password = "Fell!Dell!=";
-        $dbname = "32213694_scoreboard";
-        // Create connection
-        $conn = new mysqli($servername, $username, $password, $dbname);
-        // Check connection
-        if ($conn->connect_error) {
-            die("Connection failed: " . $conn->connect_error);
-        }
-
-        $category = $args['category'];
-        $sql = "SELECT * FROM articles WHERE tag = \"$category\" ORDER BY id DESC";
-        $result = $conn->query($sql);
-        $array = [];
-
-        if ($result->num_rows > 0) {
-            // output data of each row
-            while($row = $result->fetch_assoc()) {
-                $array[] = $row;
-            }
-        } else {
-            echo "0 results";
-        }
-        $conn->close();
-        return $response->withJson($array);
-    }
-);
 $app->get('/api/articles/search/{phrase}',
     function (Request $request, Response $response, array $args) {
         $servername = "serwer2001916.home.pl";
@@ -314,16 +254,26 @@ $app->get('/api/articles/{id}',
         $id = $args['id'];
         $sql = "SELECT * FROM articles WHERE id = $id";
         $result = $conn->query($sql);
-        $array = [];
+        $article = [];
 
         if ($result->num_rows > 0) {
             // output data of each row
-            while($row = $result->fetch_assoc()) {
-                $array[] = $row;
-            }
-        } else {
-            echo "0 results";
+            $row = $result->fetch_assoc();
+            $article = $row;
+
         }
+        $userId = $article['userId'];
+        $sql1 = "SELECT name, surname FROM users WHERE id = $userId";
+        $result1 = $conn->query($sql1);
+        $userInfo = [];
+
+        if ($result1->num_rows > 0) {
+            // output data of each row
+            $row = $result1->fetch_assoc();
+            $userInfo = $row;
+        }
+        $array = ['article' => $article, 'userInfo' => $userInfo];
+
         $conn->close();
         return $response->withJson($array);
     }
@@ -512,7 +462,7 @@ $app->post('/api/validateUniqueNick',
         if ($result->num_rows > 0) {
             // output data of each row
             while($row = $result->fetch_assoc()) {
-                if($row['nick'] == $nick) {
+                if(strtolower($row['nick']) == strtolower($nick)) {
                   return "false";
                 }
             }
@@ -570,7 +520,7 @@ $app->get('/api/articles/{id}/comments',
             die("Connection failed: " . $conn->connect_error);
         }
         $id = $args['id'];
-        $sql = "SELECT * FROM comments WHERE articleId = $id";
+        $sql = "SELECT * FROM comments WHERE articleId = $id ORDER BY id DESC";
         $result = $conn->query($sql);
         $array = [];
 

@@ -1,16 +1,24 @@
 <template>
   <div id="articleMain">
-    <div class="spinner-border text-primary" role="status" v-if="loading">
+    <div class="spinner-border text-primary" role="status" v-if="loadingArticle">
       <span class="sr-only">Loading...</span>
     </div>
-    <div class="media" v-if="!loading">
+    <div class="media" v-if="!loadingArticle">
       <div class="container">
         <div class="info">
-          <img v-if="image.length > 0" :src="image" class="mr-3 avatar">
-          <img v-else src="./assets/avatar.png" class="mr-3 avatar">
-          <div class="averageRating" v-if="articleRating != null">
+          <div class="spinner-border text-success loadingImage" role="status" v-if="loadingImage">
+            <span class="sr-only">Loading...</span>
+          </div>
+          <div v-if="!loadingImage">
+            <img v-if="image.length > 0" :src="image" class="mr-3 avatar">
+            <img v-else src="./assets/avatar.png" class="mr-3 avatar">
+          </div>
+          <div class="spinner-border text-primary" style="align-self: center ; margin-top: 10px" role="status" v-if="loadingAverageRating">
+            <span class="sr-only">Loading...</span>
+          </div>
+          <div class="averageRating" v-if="articleRating != null && !loadingAverageRating">
             <h3 class="avg">{{averageRating}}</h3>
-            <star-rating class="avgRating" :rating="parseFloat(averageRating)" read-only="true" :increment="0.01" :star-size="20" :show-rating="false"
+            <star-rating class="avgRating" :rating="parseFloat(averageRating)" :read-only="true" :increment="0.01" :star-size="20" :show-rating="false"
                :border-width="4" border-color="#d8d8d8" :rounded-corners="true"
                :star-points="[23,2, 14,17, 0,19, 10,34, 7,50, 23,43, 38,50, 36,34, 46,19, 31,17]"></star-rating>
             <h6 class="avgCount" v-if="articleRating.count > 1">Na podstawie opinii {{articleRating.count}} osób</h6>
@@ -20,13 +28,16 @@
         <div class="media-body">
 
           <div class="header">
-            <h2 class="mt-0">{{article.title}}</h2>
-            <h6>{{transformDate(article.date)}}</h6>
+            <h2 class="mt-0">{{article.article.title}}</h2>
+            <h6>{{transformDate(article.article.date)}}</h6>
           </div>
-          <p>{{article.content}}</p>
-          <p class="podpis">{{user.name}} {{user.surname}}</p>
-          <div class="bottom">
-            <star-rating v-if="article.userId != getLoggedUserId()" class="rating" v-model="myRate.rating" @rating-selected="setRating"
+          <p>{{article.article.content}}</p>
+          <p class="podpis">{{article.userInfo.name}} {{article.userInfo.surname}}</p>
+          <div class="spinner-border text-primary" role="status" v-if="loadingRating && article.article.userId != getLoggedUserId()">
+            <span class="sr-only">Loading...</span>
+          </div>
+          <div class="bottom" v-if="!loadingRating">
+            <star-rating v-if="article.article.userId != getLoggedUserId()" class="rating" v-model="myRate.rating" @rating-selected="setRating"
               :star-size="30" :show-rating="false"
                :border-width="4" border-color="#d8d8d8" :rounded-corners="true"
                :star-points="[23,2, 14,17, 0,19, 10,34, 7,50, 23,43, 38,50, 36,34, 46,19, 31,17]"></star-rating>
@@ -34,14 +45,22 @@
         </div>
       </div>
       <h4>Komentarze</h4>
-      <div class="commentSection">
+      <div class="spinner-border text-primary" role="status" v-if="loadingComments">
+        <span class="sr-only">Loading...</span>
+      </div>
+      <div class="commentSection" v-if="!loadingComments">
         <div class="comments" v-if="comments.length > 0">
+          <div class="spinner-grow text-primary" role="status" v-if="loadingNewComment">
+            <span class="sr-only">Loading...</span>
+          </div>
 
           <ul class="list-group">
             <li class="list-group-item" :key="comment.id" v-for="comment in comments">
-              <img v-if="getCommentImage(comment.userId).length > 0" :src="getCommentImage(comment.userId)" class="mr-3 commentAvatar">
-
-              <img v-else src="./assets/avatar.png" class="mr-3 commentAvatar">
+              <div class="avatarWithTooltip">
+                <img v-if="getCommentImage(comment.userId).length > 0" :src="getCommentImage(comment.userId)" class="mr-3 commentAvatar">
+                <img v-else src="./assets/avatar.png" class="mr-3 commentAvatar">
+                <md-tooltip md-direction="left">{{transformDate(comment.date)}}</md-tooltip>
+              </div>
               <div class="comContent">
                 <h6>
                   <a class="username">{{comment.userName}} {{comment.userSurname}}</a>
@@ -55,9 +74,7 @@
 
             </li>
           </ul>
-          <div class="spinner-grow text-primary" role="status" v-if="loadingNewComment">
-            <span class="sr-only">Loading...</span>
-          </div>
+
         </div>
         <div class="nocomments" v-else>
           Bądź pierwszą osobą która zamieści komentarz!<br>
@@ -101,7 +118,11 @@ export default {
         userSurname: "",
       },
       getCommentsInterval: null,
-      loading: true,
+      loadingArticle: true,
+      loadingRating: true,
+      loadingAverageRating: true,
+      loadingComments: true,
+      loadingImage: true,
       loadingNewComment: false,
       like: {
         type: "",
@@ -119,7 +140,6 @@ export default {
       averageRating: null,
       image: "",
       commentsAvatars: [],
-      user: {}
     }
   },
   methods: {
@@ -158,13 +178,15 @@ export default {
         this.$http.post('users/avatars-needed', obj).then(response => {
           this.commentsAvatars = response.body;
         });
-
-
+        if(this.loadingComments == true){
+          this.loadingComments = false;
+          this.getCommentsInterval = setInterval(this.getComments, 10000);
+        }
         this.loadingNewComment = false;
       });
     },
     getAverageRating(){
-      this.$http.get('articles/'+this.article.id+'/averageRating').then(response => {
+      this.$http.get('articles/'+this.article.article.id+'/averageRating').then(response => {
         if(response.body != null){
           this.articleRating = response.body[0];
           var numeral = require('numeral');
@@ -176,8 +198,8 @@ export default {
         }
         var obj = {};
         obj.rating = this.averageRating;
-        this.$http.put('articles/'+this.article.id+'/rating', obj);
-
+        this.$http.put('articles/'+this.article.article.id+'/rating', obj);
+        this.loadingAverageRating = false;
       });
     },
     likeComment(e, comment){
@@ -227,6 +249,7 @@ export default {
       return tDate;
     },
     setRating(rating) {
+      if(this.articleRating == null)  this.loadingAverageRating = true;
       this.myRate.rating = rating;
       if(this.myRate.id == null){
         this.$http.post('rating/add', this.myRate).then(()=>{
@@ -252,39 +275,48 @@ export default {
     }
   },
   mounted(){
+    this.image = this.$route.params.image;
     this.$http.get('articles/'+this.$route.params.id).then(response => {
-      this.article = response.body[0];
-      this.myRate.articleId = this.article.id;
+      this.article = response.body;
+      this.myRate.articleId = this.article.article.id;
       this.getAverageRating();
-      this.$http.get('users/'+this.article.userId+'/avatar').then(response => {
-        this.image = response.body[0].avatar;
-      });
-
-      this.$http.get('users/short/'+this.article.userId).then(response => {
-        this.user = response.body[0];
-      });
+      this.loadingArticle = false;
+      if(this.image == ""){
+        this.$http.get('users/'+this.article.article.userId+'/avatar').then(response => {
+          this.image = response.body[0].avatar;
+          this.loadingImage = false;
+        });
+      }
     });
+
+
+    if(this.image != "") {
+      this.loadingImage = false;
+    }
+
     this.myRate.userId = service.id;
     this.$http.get('articles/'+this.$route.params.id+'/rating/user/'+service.id).then(response => {
       if(response.body != null){
-        this.myRate.rating = response.body[0].rating;
+        this.myRate.rating = parseInt(response.body[0].rating);
         this.myRate.id = response.body[0].id;
       }
       else {
         this.myRate.rating = 0;
         this.myRate.id = null;
       }
+      this.loadingRating = false;
     });
 
     this.getComments();
-    this.getCommentsInterval = setInterval(this.getComments, 10000);
+
     this.$http.get('users/'+service.id+"/likes").then(response => {
       if(response.body != null){
         this.loggedUserLikes = response.body;
       }
       else this.loggedUserLikes = [];
-      this.loading = false;
+
     });
+
   },
   destroyed(){
     clearInterval(this.getCommentsInterval);
@@ -315,6 +347,7 @@ h4 {
 h6 {
   font-size: 10pt;
   margin-right: 30px;
+  text-align: left;
 }
 .avatar {
   border-radius: 200px;
@@ -325,8 +358,7 @@ h6 {
 .commentAvatar {
   border-radius: 30px;
   width: 30px;
-  float: left;
-  margin-bottom: 10px;
+  margin: 0 !important;
 }
 .username {
   color: #007bff !important;
@@ -425,11 +457,25 @@ button {
   margin: 0;
   font-size: 9pt;
   font-style: italic;
+  text-align: center;
 }
 .podpis {
   text-align: right;
   font-style: italic;
   font-size: 10pt;
   padding-right: 20px;
+}
+.avatarWithTooltip {
+  width: 30px;
+  margin-bottom: 10px;
+  height: 30px;
+  float: left;
+  margin-right: 20px;
+}
+.loadingImage {
+  width: 200px;
+  height: 200px;
+  min-width: 50px;
+  margin-right: 1rem;
 }
 </style>

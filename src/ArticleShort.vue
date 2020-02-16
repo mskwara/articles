@@ -1,8 +1,13 @@
 <template>
   <div id="articleName">
     <div class="media">
-      <img v-if="image.length > 0" :src="image" class="mr-3 avatar">
-      <img v-else src="./assets/avatar.png" class="mr-3 avatar">
+      <div class="spinner-border text-success loadingImage" role="status" v-if="loadingImage">
+        <span class="sr-only">Loading...</span>
+      </div>
+      <div v-if="!loadingImage">
+        <img v-if="image.length > 0" :src="image" class="mr-3 avatar">
+        <img v-else src="./assets/avatar.png" class="mr-3 avatar">
+      </div>
       <div class="media-body">
         <div class="header">
           <h2 class="mt-0">{{article.title}}</h2>
@@ -26,27 +31,36 @@
 </template>
 
 <script>
+import service from "./service.js";
 
 export default {
   name: 'articleName',
   components: {
   },
   props: {
-    article: Object
+    article: Object,
   },
   data(){
     return {
       image: "",
+      loadingImage: true,
     }
   },
   mounted(){
-    this.$http.get('users/'+this.article.userId+'/avatar').then(response => {
-      this.image = response.body[0].avatar;
-    });
+    if(this.article.userId != service.id){
+      this.$http.get('users/'+this.article.userId+'/avatar').then(response => {
+        this.image = response.body[0].avatar;
+        this.loadingImage = false;
+      });
+    }
+    else {
+      this.image = service.avatar;
+      this.loadingImage = false;
+    }
   },
   methods: {
     goToArticle(id){
-      this.$router.push({ name: 'article', params: { id: id }});
+      this.$router.push({ name: 'article', params: { id: id, image: this.image }});
     },
     transformDate(date){
       var day = parseInt(date.slice(8,10));
@@ -126,5 +140,11 @@ button {
   padding: 0;
   align-items: flex-start !important;
   flex: 1;
+}
+.loadingImage {
+  width: 200px;
+  height: 200px;
+  min-width: 50px;
+  margin-right: 1rem;
 }
 </style>

@@ -62,6 +62,7 @@ export default {
         ]
       },
       onlyMyArticles: false,
+      onlyMyArticlesImage: "",
       categories: categories.categories,
       writing_styles: writing_styles.writing_styles,
     }
@@ -76,6 +77,7 @@ export default {
             this.articlesFiltered = this.articlesFiltered.filter(function(article) {
               return article.userId == service.id;
             });
+            this.onlyMyArticlesImage = service.avatar;
           }
         }
         else this.articles = [];

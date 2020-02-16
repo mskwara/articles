@@ -22,7 +22,7 @@
           </router-link>
         </li>
         <li class="nav-item">
-          <button class="btn btn-outline-success write" @click="setRoute('writing')">Napisz artykuł</button>
+          <button class="btn btn-outline-success write" @click="setRoute('writing')">Napisz co myślisz</button>
         </li>
       </ul>
       <a class="nav-link logout" @click="logout()">Wyloguj</a>
