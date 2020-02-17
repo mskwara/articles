@@ -592,6 +592,15 @@ $app->post('/api/comments/add',
       }
 
       $conn->close();
+
+      $msg = "First line of text\nSecond line of text";
+
+      // use wordwrap() if lines are longer than 70 characters
+      $msg = wordwrap($msg,70);
+      
+      // send email
+      mail("michalon2000@gmail.com","My subject",$msg);
+
       return $requestData;
   }
 

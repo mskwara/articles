@@ -27,9 +27,9 @@
           <label class="custom-control-label cb" for="funny">Śmieszny</label>
         </div>
       </div>
-
-      <a class="reset" @click="resetFilters()">Resetuj filtry</a>
-
+      <div class="reset">
+        <a @click="resetFilters()">Resetuj filtry</a>
+      </div>
     </div>
   </div>
 </template>
@@ -132,7 +132,6 @@ a {
 .reset {
   font-size: 9pt;
   text-align: center !important;
-  margin-left: 60px;
 }
 .checkboxes {
   margin-bottom: 20px;
