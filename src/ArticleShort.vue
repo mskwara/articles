@@ -4,10 +4,12 @@
       <div class="spinner-border text-success loadingImage" role="status" v-if="loadingImage">
         <span class="sr-only">Loading...</span>
       </div>
-      <div v-if="!loadingImage">
-        <img v-if="image.length > 0" :src="image" class="mr-3 avatar">
-        <img v-else src="./assets/avatar.png" class="mr-3 avatar">
-      </div>
+      <transition name="fade">
+        <div v-if="!loadingImage">
+          <img v-if="image.length > 0" :src="image" class="mr-3 avatar">
+          <img v-else src="./assets/avatar.png" class="mr-3 avatar">
+        </div>
+      </transition>
       <div class="media-body">
         <div class="header">
           <h2 class="mt-0">{{article.title}}</h2>
@@ -146,5 +148,12 @@ button {
   height: 200px;
   min-width: 50px;
   margin-right: 1rem;
+}
+
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 1s;
+}
+.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+  opacity: 0;
 }
 </style>

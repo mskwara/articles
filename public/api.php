@@ -731,7 +731,7 @@ $app->post('/api/articles/add',
           die("Connection failed: " . $conn->connect_error);
       }
 
-      $sql = "INSERT INTO articles (title, tag, style, content, userId) VALUES('$requestData[title]', '$requestData[category]', '$requestData[style]', '$requestData[content]', '$requestData[userId]')";
+      $sql = "INSERT INTO articles (title, tag, style, content, bibliography, userId) VALUES('$requestData[title]', '$requestData[category]', '$requestData[style]', '$requestData[content]', '$requestData[bibliography]', '$requestData[userId]')";
 
       if ($conn->query($sql) === TRUE) {
           echo "New record created successfully";

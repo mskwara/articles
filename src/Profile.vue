@@ -45,7 +45,9 @@
       </form>
     </div>
     <div>
+      <transition name="fade">
       <img v-if="user.avatar.length > 0" class="avatar" :src="user.avatar">
+      </transition>
     </div>
   </div>
 
@@ -260,5 +262,12 @@ a {
 .success {
   border: 2px solid green !important;
   border-radius: 10px;
+}
+
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 1s;
+}
+.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+  opacity: 0;
 }
 </style>

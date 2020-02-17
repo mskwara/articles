@@ -33,6 +33,12 @@
           </div>
           <p>{{article.article.content}}</p>
           <p class="podpis">{{article.userInfo.name}} {{article.userInfo.surname}}</p>
+          <div class="bibliography" v-if="article.article.bibliography != ''">
+            <a @click="toggleBibliography()">{{showBibliographyText}}</a>
+            <transition name="fade">
+              <p v-if="isBibliographyVisible == true">{{article.article.bibliography}}</p>
+            </transition>
+          </div>
           <div class="spinner-border text-primary" role="status" v-if="loadingRating && article.article.userId != getLoggedUserId()">
             <span class="sr-only">Loading...</span>
           </div>
@@ -50,10 +56,9 @@
       </div>
       <div class="commentSection" v-if="!loadingComments">
         <div class="comments" v-if="comments.length > 0">
-          <div class="spinner-grow text-primary" role="status" v-if="loadingNewComment">
-            <span class="sr-only">Loading...</span>
-          </div>
-
+            <div class="spinner-grow text-primary" role="status" v-if="loadingNewComment">
+              <span class="sr-only">Loading...</span>
+            </div>
           <ul class="list-group">
             <li class="list-group-item" :key="comment.id" v-for="comment in comments">
               <div class="avatarWithTooltip">
@@ -67,8 +72,8 @@
                   {{comment.content}}
                 </h6>
                 <div class="likeIconComments">
-                  <img src="./assets/like.svg" @click="likeComment($event, comment)" :class="checkIfUserLikedAlready('comment',comment.id) ? 'likeDisabled' : ''" />
-                  <md-tooltip md-direction="right">{{comment.likes}} likes</md-tooltip>
+                  <img src="./assets/like.svg" @click="likeComment($event, comment)" :class="checkIfUserLikedAlready('comment',comment.id) ? 'likeDisabled' : 'likeEnabled'" />
+                  <h5 class="numberOfLikes">{{comment.likes}}</h5>
                 </div>
               </div>
 
@@ -140,6 +145,8 @@ export default {
       averageRating: null,
       image: "",
       commentsAvatars: [],
+      showBibliographyText: "Bibliografia",
+      isBibliographyVisible: false,
     }
   },
   methods: {
@@ -204,7 +211,9 @@ export default {
     },
     likeComment(e, comment){
       if(this.checkIfUserLikedAlready('comment',comment.id) == false){
+        e.target.classList.remove('likeEnabled');
         e.target.classList.toggle('likeDisabled');
+        comment.likes++;
         this.$http.put('comments/'+comment.id+'/incrementLikes');
         this.like.type = "comment";
         this.like.objId = comment.id;
@@ -219,6 +228,8 @@ export default {
       }
       else {
         e.target.classList.remove('likeDisabled');
+        e.target.classList.toggle('likeEnabled');
+        comment.likes--;
         this.$http.put('comments/'+comment.id+'/decrementLikes');
         this.like.type = "comment";
         this.like.objId = comment.id;
@@ -272,6 +283,15 @@ export default {
     },
     getLoggedUserId(){
       return service.id;
+    },
+    toggleBibliography(){
+      this.isBibliographyVisible = !this.isBibliographyVisible;
+      if(this.isBibliographyVisible == true){
+        this.showBibliographyText = "Ukryj";
+      }
+      else {
+        this.showBibliographyText = "Bibliografia";
+      }
     }
   },
   mounted(){
@@ -372,6 +392,7 @@ p {
   word-wrap: break-word;
   max-width: 800px;
   min-width: 500px;
+  text-align: left;
 }
 .header {
   display: flex;
@@ -391,13 +412,29 @@ button {
   margin-right: 5px;
 }
 .likeIconComments {
-  width: 20px !important;
-  min-width: 20px !important;
-  height: 20px !important;
-  min-height: 20px !important;
+  width: 45px !important;
+  min-width: 45px !important;
+  height: 30px !important;
+  min-height: 30px !important;
   margin-right: 5px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
   float: right;
-  cursor: pointer;
+  background-color: white;
+  border-radius: 30px;
+  box-shadow: 4px 4px 2px #ebebeb;
+  border: 1px solid #ebebeb;
+}
+.likeIconComments img {
+  width: 20px;
+}
+.numberOfLikes {
+  margin-top: 13px;
+  font-size: 9pt;
+  margin-left: 3px;
+  color: #7a7a7a;
 }
 .comContent {
   display: flex;
@@ -436,6 +473,11 @@ button {
 }
 .likeDisabled {
   opacity: 0.4 !important;
+  cursor: pointer;
+}
+.likeEnabled {
+  opacity: 1 !important;
+  cursor: pointer;
 }
 .rating {
   margin-right: 30px;
@@ -477,5 +519,23 @@ button {
   height: 200px;
   min-width: 50px;
   margin-right: 1rem;
+}
+.bibliography a {
+  cursor: pointer;
+  font-size: 9pt;
+}
+.bibliography p {
+  font-size: 7pt;
+  font-style: italic;
+}
+.bibliography {
+  text-align: left;
+}
+
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 1s;
+}
+.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+  opacity: 0;
 }
 </style>
