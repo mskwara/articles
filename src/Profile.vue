@@ -120,7 +120,6 @@ export default {
   },
   methods: {
     onFileChange(event) {
-      //this.newUser.avatar = event.target.files[0];  //do firebase
       const file = event.target.files[0];
       if(!file || file.type.indexOf('image/') !== 0){ //zły format pliku
         event.preventDefault();
@@ -156,7 +155,7 @@ export default {
       if (input.files && input.files[0]) {
           reader = new FileReader();
           reader.onload = (e) => {
-              this.newUser.avatar = e.target.result;
+              this.user.avatar = e.target.result;
           }
           reader.readAsDataURL(input.files[0]);
       }
