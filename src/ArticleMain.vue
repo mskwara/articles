@@ -9,7 +9,7 @@
           <div class="spinner-border text-success loadingImage" role="status" v-if="loadingImage">
             <span class="sr-only">Loading...</span>
           </div>
-          <div v-if="!loadingImage">
+          <div id="image" v-if="!loadingImage">
             <img v-if="image.length > 0" :src="image" class="mr-3 avatar">
             <img v-else src="./assets/avatar.png" class="mr-3 avatar">
           </div>
@@ -50,7 +50,7 @@
           </div>
         </div>
       </div>
-      <h4>Komentarze</h4>
+      <h4 id="komentarze">Komentarze</h4>
       <div class="spinner-border text-primary" role="status" v-if="loadingComments">
         <span class="sr-only">Loading...</span>
       </div>
@@ -351,6 +351,8 @@ export default {
   padding: 20px;
   display: flex;
   flex-direction: column;
+  animation-name: animationPop;
+  animation-duration: 1s;
 }
 .container {
   display: flex;
@@ -461,6 +463,8 @@ button {
   flex-wrap: nowrap;
   justify-content: space-between;
   width: 100%;
+  animation-name: animationPop;
+  animation-duration: 1s;
 }
 .date {
   font-size: 6pt;
@@ -485,6 +489,10 @@ button {
 .avgRating {
   justify-content: center;
   margin-bottom: 10px;
+}
+.averageRating {
+  animation-name: animationPop;
+  animation-duration: 1s;
 }
 .info {
   display: flex;
@@ -537,5 +545,22 @@ button {
 }
 .fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
   opacity: 0;
+}
+
+@keyframes animationPop {
+  from {opacity: 0}
+  to {opacity: 1}
+}
+#image {
+  animation-name: animationPop;
+  animation-duration: 1s;
+}
+#komentarze {
+  animation-name: animationPop;
+  animation-duration: 1s;
+}
+li {
+  animation-name: animationPop;
+  animation-duration: 1s;
 }
 </style>

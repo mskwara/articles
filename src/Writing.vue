@@ -116,6 +116,8 @@ export default {
 <style scoped>
 #writing {
   text-align: left;
+  animation-name: animationPop;
+  animation-duration: 1s;
 }
 h3 {
   margin-bottom: 20px;
@@ -149,5 +151,9 @@ small {
 .form {
   display: flex;
   flex-direction: column;
+}
+@keyframes animationPop {
+  from {opacity: 0}
+  to {opacity: 1}
 }
 </style>

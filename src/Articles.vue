@@ -1,27 +1,31 @@
 <template>
   <div id="articlesName">
 
-    <div class="chips">
-      <md-chip class="md-accent chip" v-if="filter.category != ''">{{ getLabelForCategory(filter.category) }}</md-chip>
-      <md-chip class="md-accent chip" v-else>Wszystkie</md-chip>
-      <div :key="style.key" v-for="style in filter.styles">
-        <md-chip class="md-primary chip" v-if="style.value == true">{{ getLabelForStyle(style.key) }}</md-chip>
+      <div class="chips">
+        <md-chip class="md-accent chip" v-if="filter.category != ''">{{ getLabelForCategory(filter.category) }}</md-chip>
+        <md-chip class="md-accent chip" v-else>Wszystkie</md-chip>
+        <div :key="style.key" v-for="style in filter.styles">
+          <md-chip class="md-primary chip" v-if="style.value == true">{{ getLabelForStyle(style.key) }}</md-chip>
+        </div>
       </div>
-    </div>
-    <div class="spinner-border text-primary" role="status" v-if="loading">
-      <span class="sr-only">Loading...</span>
-    </div>
-    <div v-if="articles.length > 0">
-      <div class="article" :key="article.id" v-for="article in articlesFiltered">
-        <article-short :article="article"></article-short>
+      <transition name="fade">
+        <div v-if="articlesFiltered.length == 0 && !loading && !onlyMyArticles">
+          Nikt nie napisał jeszcze żadnego artykułu o wybranych kryteriach.
+        </div>
+        <div v-if="articlesFiltered.length == 0 && !loading && onlyMyArticles">
+          Nie napisałeś jeszcze żadnego artykułu o wybranych kryteriach.
+        </div>
+      </transition>
+      <div class="spinner-border text-primary" role="status" v-if="loading">
+        <span class="sr-only">Loading...</span>
       </div>
-    </div>
-    <div v-if="articlesFiltered.length == 0 && !loading && !onlyMyArticles">
-      Nikt nie napisał jeszcze żadnego artykułu o wybranych kryteriach.
-    </div>
-    <div v-if="articlesFiltered.length == 0 && !loading && onlyMyArticles">
-      Nie napisałeś jeszcze żadnego artykułu o wybranych kryteriach.
-    </div>
+      <div v-if="articles.length > 0">
+        <div class="article" :key="article.id" v-for="article in articlesFiltered">
+          <article-short :article="article"></article-short>
+        </div>
+      </div>
+      
+      
 
   </div>
 </template>
@@ -165,9 +169,12 @@ export default {
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  animation-name: animationPop;
+  animation-duration: 1s;
 }
 .article {
   margin-bottom: 30px;
+  
 }
 .chips {
   display: flex;
@@ -176,5 +183,15 @@ export default {
 }
 .chip {
   margin-right: 10px;
+}
+@keyframes animationPop {
+  from {opacity: 0;}
+  to {opacity: 1;}
+}
+.fade-enter-active {
+  transition: opacity 1s;
+}
+.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+  opacity: 0;
 }
 </style>

@@ -84,6 +84,8 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
+  animation-name: animationPop;
+  animation-duration: 1s;
 }
 .media {
   border: 1px solid gray;
@@ -155,5 +157,9 @@ button {
 }
 .fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
   opacity: 0;
+}
+@keyframes animationPop {
+  from {opacity: 0}
+  to {opacity: 1}
 }
 </style>

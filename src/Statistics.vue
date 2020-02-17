@@ -3,7 +3,7 @@
   <div class="spinner-border text-primary" role="status" v-if="loading">
     <span class="sr-only">Loading...</span>
   </div>
-  <div v-if="!loading">
+  <div class="page" v-if="!loading">
     <h3>Twoje statystyki</h3>
     <div class="container">
       <div class="ratingArea">
@@ -160,5 +160,13 @@ h3 {
   text-align: left;
   margin-top: 30px;
   margin-left: 10px;
+}
+@keyframes animationPop {
+  from {opacity: 0}
+  to {opacity: 1}
+}
+.page {
+  animation-name: animationPop;
+  animation-duration: 1s;
 }
 </style>

@@ -1,5 +1,6 @@
 <template>
   <div id="articlessearched">
+    <md-chip class="md-accent chip">{{ phrase }}</md-chip>
     <div class="spinner-border text-primary" role="status" v-if="loading">
       <span class="sr-only">Loading...</span>
     </div>
@@ -61,5 +62,9 @@ export default {
 }
 .article {
   margin-bottom: 30px;
+}
+.chip {
+  margin-bottom: 10px;
+  text-transform: capitalize;
 }
 </style>
