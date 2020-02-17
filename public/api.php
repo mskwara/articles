@@ -595,6 +595,34 @@ $app->post('/api/comments/add',
       return $requestData;
   }
 
+);$app->post('/api/comments/delete',
+     function (Request $request, Response $response, array $args) {
+
+      $servername = "serwer2001916.home.pl";
+      $username = "32213694_scoreboard";
+      $password = "Fell!Dell!=";
+      $dbname = "32213694_scoreboard";
+
+      $requestData = $request->getParsedBody();
+      // Create connection
+      $conn = new mysqli($servername, $username, $password, $dbname);
+      // Check connection
+      if ($conn->connect_error) {
+          die("Connection failed: " . $conn->connect_error);
+      }
+      $id = $requestData['id'];
+      $sql = "DELETE FROM comments WHERE id = $id";
+
+      if ($conn->query($sql) === TRUE) {
+          echo "New record created successfully";
+      } else {
+          echo "Error: " . $sql . "<br>" . $conn->error;
+      }
+
+      $conn->close();
+      return $requestData;
+  }
+
 );
 $app->post('/api/likes/add',
      function (Request $request, Response $response, array $args) {

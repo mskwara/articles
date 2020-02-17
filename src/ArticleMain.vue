@@ -44,7 +44,7 @@
           </div>
           <div class="bottom" v-if="!loadingRating">
             <star-rating v-if="article.article.userId != getLoggedUserId()" class="rating" v-model="myRate.rating" @rating-selected="setRating"
-              :star-size="30" :show-rating="false"
+              :star-size="30" :show-rating="false" :read-only="addingNewRating"
                :border-width="4" border-color="#d8d8d8" :rounded-corners="true"
                :star-points="[23,2, 14,17, 0,19, 10,34, 7,50, 23,43, 38,50, 36,34, 46,19, 31,17]"></star-rating>
           </div>
@@ -67,7 +67,7 @@
                 <md-tooltip md-direction="left">{{transformDate(comment.date)}}</md-tooltip>
               </div>
               <div class="comContent">
-                <h6>
+                <h6 class="inCommentH6">
                   <a class="username">{{comment.userName}} {{comment.userSurname}}</a>
                   {{comment.content}}
                 </h6>
@@ -75,8 +75,10 @@
                   <img src="./assets/like.svg" @click="likeComment($event, comment)" :class="checkIfUserLikedAlready('comment',comment.id) ? 'likeDisabled' : 'likeEnabled'" />
                   <h5 class="numberOfLikes">{{comment.likes}}</h5>
                 </div>
+                <div class="deleteComment" v-if="comment.userId == getLoggedUserId()">
+                  <img src="./assets/cancel.svg" @click="deleteComment($event, comment)" />
+                </div>
               </div>
-
             </li>
           </ul>
 
@@ -147,6 +149,8 @@ export default {
       commentsAvatars: [],
       showBibliographyText: "Bibliografia",
       isBibliographyVisible: false,
+      addingNewRating: false,
+      togglingLike: false,
     }
   },
   methods: {
@@ -210,37 +214,51 @@ export default {
       });
     },
     likeComment(e, comment){
-      if(this.checkIfUserLikedAlready('comment',comment.id) == false){
-        e.target.classList.remove('likeEnabled');
-        e.target.classList.toggle('likeDisabled');
-        comment.likes++;
-        this.$http.put('comments/'+comment.id+'/incrementLikes');
+      if(this.togglingLike == false){
         this.like.type = "comment";
         this.like.objId = comment.id;
         this.like.userId = service.id;
-        this.$http.post('likes/add', this.like);
-        this.$http.get('users/'+service.id+"/likes").then(response => {
-          if(response.body != null) this.loggedUserLikes = response.body;
-          else this.loggedUserLikes = [];
-
-          this.getComments();
-        });
+        this.togglingLike = true;
+        if(this.checkIfUserLikedAlready('comment',comment.id) == false){
+          e.target.classList.remove('likeEnabled');
+          e.target.classList.toggle('likeDisabled');
+          comment.likes++;
+          this.$http.put('comments/'+comment.id+'/incrementLikes').then(() => {
+            this.$http.post('likes/add', this.like).then(()=>{
+              this.$http.get('users/'+service.id+"/likes").then(response => {
+                if(response.body != null) this.loggedUserLikes = response.body;
+                else this.loggedUserLikes = [];
+                this.togglingLike = false;
+                this.getComments();
+              });
+            });
+          });
+        }
+        else {
+          e.target.classList.remove('likeDisabled');
+          e.target.classList.toggle('likeEnabled');
+          comment.likes--;
+          this.$http.put('comments/'+comment.id+'/decrementLikes').then(() => {
+            this.$http.post('likes/delete', this.like).then(()=>{
+              this.$http.get('users/'+service.id+"/likes").then(response => {
+                if(response.body != null) this.loggedUserLikes = response.body;
+                else this.loggedUserLikes = [];
+                this.togglingLike = false;
+                this.getComments();
+              });
+            });
+          });
+        }
       }
-      else {
-        e.target.classList.remove('likeDisabled');
-        e.target.classList.toggle('likeEnabled');
-        comment.likes--;
-        this.$http.put('comments/'+comment.id+'/decrementLikes');
-        this.like.type = "comment";
-        this.like.objId = comment.id;
-        this.like.userId = service.id;
-        this.$http.post('likes/delete', this.like);
-        this.$http.get('users/'+service.id+"/likes").then(response => {
-          if(response.body != null) this.loggedUserLikes = response.body;
-          else this.loggedUserLikes = [];
-          this.getComments();
-        });
+    },
+    deleteComment(e, comment){
+      this.$http.post('comments/delete', comment);
+      for(var i = 0 ; i < this.comments.length ; i++){
+        if(this.comments[i].id == comment.id){
+          this.comments.splice(i, 1);
+        }
       }
+      this.getComments();
     },
     checkIfUserLikedAlready(type, objId){
       for(var i = 0; i < this.loggedUserLikes.length ; i++){
@@ -260,15 +278,26 @@ export default {
       return tDate;
     },
     setRating(rating) {
+      this.addingNewRating = true;
       if(this.articleRating == null)  this.loadingAverageRating = true;
       this.myRate.rating = rating;
       if(this.myRate.id == null){
         this.$http.post('rating/add', this.myRate).then(()=>{
+          this.$http.get('articles/'+this.article.article.id+'/rating/user/'+service.id).then(response => {
+            if(response.body != null){
+              this.myRate.id = response.body[0].id;
+            }
+            else {
+              this.myRate.id = null;
+            }
+            this.addingNewRating = false;
+          });
           this.getAverageRating();
         });
       }
       else {
         this.$http.put('rating/update', this.myRate).then(()=>{
+          this.addingNewRating = false;
           this.getAverageRating();
         });
       }
@@ -432,6 +461,26 @@ button {
 .likeIconComments img {
   width: 20px;
 }
+.deleteComment {
+  width: 20px;
+  min-width: 20px;
+  height: 20px;
+  min-height: 20px;
+  display: flex;
+  justify-content: center;
+  align-self: center;
+  align-items: center;
+  margin-left: 20px;
+  border-radius: 20px;
+  transition: 0.3s;
+}
+.deleteComment:hover {
+  transform: rotate(180deg);
+  
+}
+.deleteComment img {
+  width: 10px;
+}
 .numberOfLikes {
   margin-top: 13px;
   font-size: 9pt;
@@ -441,7 +490,7 @@ button {
 .comContent {
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
+  
 }
 .comments {
   width: 50%;
@@ -538,6 +587,9 @@ button {
 }
 .bibliography {
   text-align: left;
+}
+.inCommentH6 {
+  flex-grow: 5;
 }
 
 .fade-enter-active, .fade-leave-active {
