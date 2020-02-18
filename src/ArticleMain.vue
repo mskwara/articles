@@ -10,8 +10,8 @@
             <span class="sr-only">Loading...</span>
           </div>
           <div id="image" v-if="!loadingImage">
-            <img v-if="image.length > 0" :src="image" class="mr-3 avatar">
-            <img v-else src="./assets/avatar.png" class="mr-3 avatar">
+            <img v-if="image.length > 0" :src="image" class="mr-3 avatar" @click="goToUserInfo(article.article.userId)">
+            <img v-else src="./assets/avatar.png" class="mr-3 avatar" @click="goToUserInfo(article.article.userId)">
           </div>
           <div class="spinner-border text-primary" style="align-self: center ; margin-top: 10px" role="status" v-if="loadingAverageRating">
             <span class="sr-only">Loading...</span>
@@ -29,7 +29,10 @@
 
           <div class="header">
             <h2 class="mt-0">{{article.article.title}}</h2>
-            <h6>{{transformDate(article.article.date)}}</h6>
+            <div class="topRight">
+              <a class="edit" v-if="article.article.userId == getLoggedUserId()" @click="goToEditing()">Edytuj</a>
+              <h6>{{transformDate(article.article.date)}}</h6>
+            </div>
           </div>
           <p>{{article.article.content}}</p>
           <p class="podpis">{{article.userInfo.name}} {{article.userInfo.surname}}</p>
@@ -55,39 +58,46 @@
         <span class="sr-only">Loading...</span>
       </div>
       <div class="commentSection" v-if="!loadingComments">
-        <div class="comments" v-if="comments.length > 0">
+        <div class="comOrNotCom">
+          <transition name="fade">
+          <div class="comments" v-if="comments.length > 0">
+              <div class="spinner-grow text-primary" role="status" v-if="loadingNewComment">
+                <span class="sr-only">Loading...</span>
+              </div>
+            <ul class="list-group">
+              <transition-group name="fade">
+              <li class="list-group-item" :key="comment.id" v-for="comment in comments">
+                <div class="avatarWithTooltip">
+                  <img v-if="getCommentImage(comment.userId).length > 0" :src="getCommentImage(comment.userId)" class="mr-3 commentAvatar">
+                  <img v-else src="./assets/avatar.png" class="mr-3 commentAvatar">
+                  <md-tooltip md-direction="left">{{transformDate(comment.date)}}</md-tooltip>
+                </div>
+                <div class="comContent">
+                  <h6 class="inCommentH6">
+                    <a class="username" @click="goToUserInfo(comment.userId)">{{comment.userName}} {{comment.userSurname}}</a>
+                    {{comment.content}}
+                  </h6>
+                  <div class="likeIconComments">
+                    <img src="./assets/like.svg" @click="likeComment($event, comment)" :class="checkIfUserLikedAlready('comment',comment.id) ? 'likeDisabled' : 'likeEnabled'" />
+                    <h5 class="numberOfLikes">{{comment.likes}}</h5>
+                  </div>
+                  <div class="deleteComment" v-if="comment.userId == getLoggedUserId()">
+                    <img src="./assets/cancel.svg" @click="deleteComment($event, comment)" />
+                  </div>
+                </div>
+              </li>
+              </transition-group>
+            </ul>
+          </div>
+          </transition>
+          <transition name="fadeDelay">
+          <div class="nocomments" v-if="comments.length == 0">
+            Bądź pierwszą osobą która zamieści komentarz!<br>
             <div class="spinner-grow text-primary" role="status" v-if="loadingNewComment">
               <span class="sr-only">Loading...</span>
             </div>
-          <ul class="list-group">
-            <li class="list-group-item" :key="comment.id" v-for="comment in comments">
-              <div class="avatarWithTooltip">
-                <img v-if="getCommentImage(comment.userId).length > 0" :src="getCommentImage(comment.userId)" class="mr-3 commentAvatar">
-                <img v-else src="./assets/avatar.png" class="mr-3 commentAvatar">
-                <md-tooltip md-direction="left">{{transformDate(comment.date)}}</md-tooltip>
-              </div>
-              <div class="comContent">
-                <h6 class="inCommentH6">
-                  <a class="username">{{comment.userName}} {{comment.userSurname}}</a>
-                  {{comment.content}}
-                </h6>
-                <div class="likeIconComments">
-                  <img src="./assets/like.svg" @click="likeComment($event, comment)" :class="checkIfUserLikedAlready('comment',comment.id) ? 'likeDisabled' : 'likeEnabled'" />
-                  <h5 class="numberOfLikes">{{comment.likes}}</h5>
-                </div>
-                <div class="deleteComment" v-if="comment.userId == getLoggedUserId()">
-                  <img src="./assets/cancel.svg" @click="deleteComment($event, comment)" />
-                </div>
-              </div>
-            </li>
-          </ul>
-
-        </div>
-        <div class="nocomments" v-else>
-          Bądź pierwszą osobą która zamieści komentarz!<br>
-          <div class="spinner-grow text-primary" role="status" v-if="loadingNewComment">
-            <span class="sr-only">Loading...</span>
           </div>
+          </transition>
         </div>
 
 
@@ -321,7 +331,13 @@ export default {
       else {
         this.showBibliographyText = "Bibliografia";
       }
-    }
+    },
+    goToUserInfo(id){
+      this.$router.push({ name: 'user', params: { userId: id }});
+    },
+    goToEditing(){
+      this.$router.push({ name: 'editarticle', params: { article: this.article.article }});
+    },
   },
   mounted(){
     this.image = this.$route.params.image;
@@ -493,11 +509,11 @@ button {
   
 }
 .comments {
-  width: 50%;
+  width: 100%;
   float: left;
 }
 .nocomments {
-  width: 50%;
+  width: 100%;
   float: left;
   text-align: left;
   margin-left: 20px;
@@ -591,6 +607,29 @@ button {
 .inCommentH6 {
   flex-grow: 5;
 }
+.comOrNotCom {
+  display: flex;
+  flex-direction: column;
+  width: 50%;
+}
+img {
+  cursor: pointer;
+  transition: 0.3s;
+  
+}
+img:hover {
+  transform: scale(0.98);
+}
+.edit {
+  cursor: pointer;
+  font-size: 8pt;
+  margin-right: 30px;
+  margin-bottom: .5rem;
+}
+.topRight {
+  display: flex;
+  flex-direction: row;
+}
 
 .fade-enter-active, .fade-leave-active {
   transition: opacity 1s;
@@ -598,6 +637,20 @@ button {
 .fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
   opacity: 0;
 }
+
+
+
+.fadeDelay-enter-active {
+  transition: opacity 1s;
+  transition-delay: 1s;
+}
+.fadeDelay-leave-active {
+  transition: opacity 1s;
+}
+.fadeDelay-enter, .fadeDelay-leave-to /* .fade-leave-active below version 2.1.8 */ {
+  opacity: 0;
+}
+
 
 @keyframes animationPop {
   from {opacity: 0}
@@ -615,4 +668,5 @@ li {
   animation-name: animationPop;
   animation-duration: 1s;
 }
+
 </style>

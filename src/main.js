@@ -7,7 +7,9 @@ import ArticleMain from './ArticleMain.vue'
 import Writing from './Writing.vue'
 import Register from './Register.vue'
 import Profile from './Profile.vue'
+import User from './User.vue'
 import Statistics from './Statistics.vue'
+import EditArticle from './EditArticle.vue'
 import Login from './Login.vue'
 import 'bootstrap/dist/css/bootstrap.min.css';
 import VueRouter from 'vue-router'
@@ -42,7 +44,9 @@ const router = new VueRouter({
         { path: '/article/:id', name: 'article', component: ArticleMain, params: true },
         { path: '/writing', name: 'writing', component: Writing },
         { path: '/profile', name: 'profile', component: Profile },
+        { path: '/user', name: 'user', component: User, params: true },
         { path: '/statistics', name: 'statistics', component: Statistics },
+        { path: '/editarticle', name: 'editarticle', component: EditArticle },
     ]},
     { path: '/login', name: 'login', component: Login },
     { path: '/register', name: 'register', component: Register },

@@ -17,7 +17,7 @@
           <input type="email" class="form-control" placeholder="Email" v-model="newUser.email">
         </div>
         <div class="form-group">
-          <textarea type="text" class="form-control" placeholder="Opis" aria-describedby="descriptionHelp" v-model="newUser.description"></textarea>
+          <textarea type="text" class="form-control" placeholder="Opis" rows="5" aria-describedby="descriptionHelp" v-model="newUser.description"></textarea>
           <small id="descriptionHelp" class="form-text text-muted">Napisz coś o sobie</small>
         </div>
 
@@ -70,6 +70,16 @@
       md-title="Mamy problem..."
       :md-content="imageErrorText"
       md-confirm-text="Zamknij" />
+  <md-dialog-alert class="error"
+      :md-active.sync="tooShortNick"
+      md-title="Coś poszło nie tak..."
+      md-content="Twój nick jest za krótki! Minimalna długość to 4 znaki."
+      md-confirm-text="Zamknij" />
+  <md-dialog-alert class="error"
+      :md-active.sync="tooShortPassword"
+      md-title="Coś poszło nie tak..."
+      md-content="Twoje hasło jest za krótkie! Minimalna długość to 6 znaków."
+      md-confirm-text="Zamknij" />
 
 </div>
 </template>
@@ -95,6 +105,8 @@ export default {
       failed: false,
       notUniqueNick: false,
       imageError: false,
+      tooShortNick: false,
+      tooShortPassword: false,
       imageErrorText: "",
     }
   },
@@ -150,8 +162,21 @@ export default {
       // const formData = new FormData()
       // formData.append('image', this.newUser.avatar, this.newUser.avatar.name)
       // axios.post('https://us-central1-oczymmyslisz-ad918.cloudfunctions.net/uploadFile ', formData)
+
+      
+
       if(this.newUser.name != "" && this.newUser.surname != ""
        && this.newUser.nick != "" && this.newUser.email != "" && this.newUser.password != ""){
+
+          if(this.newUser.nick.length <= 3) {
+            this.tooShortNick = true;
+            return;
+          }
+          if(this.newUser.password.length <= 5) {
+            this.tooShortPassword = true;
+            return;
+          }
+
             this.$http.post('validateUniqueNick', this.newUser).then(response => {
               if(response.body == "true"){
                 this.$http.post('users/add', this.newUser);
@@ -210,7 +235,7 @@ h3 {
   margin-top: 30px;
 }
 .form {
-  width: 50%;
+  width: 60%;
   text-align: left;
 }
 .avatar {

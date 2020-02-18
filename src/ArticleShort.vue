@@ -6,8 +6,8 @@
       </div>
       <transition name="fade">
         <div v-if="!loadingImage">
-          <img v-if="image.length > 0" :src="image" class="mr-3 avatar">
-          <img v-else src="./assets/avatar.png" class="mr-3 avatar">
+          <img v-if="image.length > 0" :src="image" class="mr-3 avatar" @click="goToUserInfo(parseInt(article.userId))">
+          <img v-else src="./assets/avatar.png" class="mr-3 avatar" @click="goToUserInfo(parseInt(article.userId))">
         </div>
       </transition>
       <div class="media-body">
@@ -17,7 +17,10 @@
             :increment="0.01" :star-size="20" :show-rating="false"
              :border-width="4" border-color="#d8d8d8" :rounded-corners="true"
              :star-points="[23,2, 14,17, 0,19, 10,34, 7,50, 23,43, 38,50, 36,34, 46,19, 31,17]"></star-rating>
-          <h6>{{transformDate(article.date)}}</h6>
+          <div class="topRight">
+            <a class="edit" v-if="article.userId == getCurrentLoggedUserId()" @click="goToEditing()">Edytuj</a>
+            <h6>{{transformDate(article.date)}}</h6>
+          </div>
         </div>
         <p>{{article.content}}</p>
         <div class="bottom">
@@ -64,6 +67,9 @@ export default {
     goToArticle(id){
       this.$router.push({ name: 'article', params: { id: id, image: this.image }});
     },
+    goToEditing(){
+      this.$router.push({ name: 'editarticle', params: { article: this.article }});
+    },
     transformDate(date){
       var day = parseInt(date.slice(8,10));
       var monthTable = ["stycznia", "lutego", "marca", "kwietnia", "maja", "czerwca", "lipca", "sierpnia", "września", "października", "listopada", "grudnia"];
@@ -72,6 +78,12 @@ export default {
       var time = date.slice(11,16);
       var tDate = day+" "+month+" "+year+", "+time;
       return tDate;
+    },
+    goToUserInfo(id){
+      this.$router.push({ name: 'user', params: { userId: id }});
+    },
+    getCurrentLoggedUserId(){
+      return service.id;
     }
   },
 }
@@ -151,7 +163,24 @@ button {
   min-width: 50px;
   margin-right: 1rem;
 }
-
+img.avatar {
+  cursor: pointer;
+  transition: 0.3s;
+  
+}
+img.avatar:hover {
+  transform: scale(0.98);
+}
+.edit {
+  cursor: pointer;
+  font-size: 8pt;
+  margin-right: 30px;
+  margin-bottom: .5rem;
+}
+.topRight {
+  display: flex;
+  flex-direction: row;
+}
 .fade-enter-active, .fade-leave-active {
   transition: opacity 1s;
 }
