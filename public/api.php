@@ -6,7 +6,7 @@ require __DIR__ . '/../vendor/autoload.php';
 
 $app = new \Slim\App;
 
-$app->get('/api/articles',
+$app->get('/api/articles/count',
     function (Request $request, Response $response, array $args) {
         $servername = "serwer2001916.home.pl";
         $username = "32213694_scoreboard";
@@ -19,7 +19,158 @@ $app->get('/api/articles',
             die("Connection failed: " . $conn->connect_error);
         }
 
-        $sql = "SELECT * FROM articles ORDER BY id DESC";
+        $sql = "SELECT id FROM articles";
+        $result = $conn->query($sql);
+        $count = 0;
+
+        if ($result->num_rows > 0) {
+            // output data of each row
+            while($row = $result->fetch_assoc()) {
+                $count++;
+            }
+        } else {
+            echo "0 results";
+        }
+        $conn->close();
+        return $response->withJson($count);
+    }
+);
+$app->post('/api/articles/maxPage',
+    function (Request $request, Response $response, array $args) {
+        $servername = "serwer2001916.home.pl";
+        $username = "32213694_scoreboard";
+        $password = "Fell!Dell!=";
+        $dbname = "32213694_scoreboard";
+
+        $requestData = $request->getParsedBody();
+        // Create connection
+        $conn = new mysqli($servername, $username, $password, $dbname);
+        // Check connection
+        if ($conn->connect_error) {
+            die("Connection failed: " . $conn->connect_error);
+        }
+
+        $userArticles = $requestData['userArticles'];
+        $userId = $requestData['userId'];
+        if($userArticles == false){
+            $category = $requestData['category'];
+            $styles = $requestData['styles'];
+            $onlyMyArticles = $requestData['onlyMyArticles'];
+            $s0 = "";
+            $s1 = "";
+            $s2 = "";
+            if($styles[0]['value'] == true) $s0 = $styles[0]['key'];
+            if($styles[1]['value'] == true) $s1 = $styles[1]['key'];
+            if($styles[2]['value'] == true) $s2 = $styles[2]['key'];
+
+            
+            if($category != ""){
+                if($onlyMyArticles == false){
+                    $sql = "SELECT id FROM articles WHERE tag = \"$category\"
+                    AND (style = \"$s0\" OR style = \"$s1\" OR style = \"$s2\")";
+                }
+                else {
+                    $sql = "SELECT id FROM articles WHERE userId = $userId AND tag = \"$category\"
+                    AND (style = \"$s0\" OR style = \"$s1\" OR style = \"$s2\")";
+                }
+            }
+            else {
+                if($onlyMyArticles == false){
+                    $sql = "SELECT id FROM articles WHERE
+                    style = \"$s0\" OR style = \"$s1\" OR style = \"$s2\"";
+                }
+                else {
+                    $sql = "SELECT id FROM articles WHERE userId = $userId AND
+                    (style = \"$s0\" OR style = \"$s1\" OR style = \"$s2\")";
+                }
+            }
+        }
+        else {
+            $sql = "SELECT id FROM articles WHERE userId = $userId";
+        }
+        
+        $result = $conn->query($sql);
+        $count = 0;
+
+        if ($result->num_rows > 0) {
+            // output data of each row
+            while($row = $result->fetch_assoc()) {
+                $count++;
+            }
+        } else {
+            echo "0 results";
+        }
+        $conn->close();
+        $limit = 6;
+        if($count % $limit == 0){
+            $maxPage = intdiv($count, $limit) - 1;
+        }
+        else {
+            $maxPage = intdiv($count, $limit);
+        }
+        return $response->withJson($maxPage);
+    }
+);
+$app->post('/api/articles',
+    function (Request $request, Response $response, array $args) {
+        $servername = "serwer2001916.home.pl";
+        $username = "32213694_scoreboard";
+        $password = "Fell!Dell!=";
+        $dbname = "32213694_scoreboard";
+
+        $requestData = $request->getParsedBody();
+        // Create connection
+        $conn = new mysqli($servername, $username, $password, $dbname);
+        // Check connection
+        if ($conn->connect_error) {
+            die("Connection failed: " . $conn->connect_error);
+        }
+
+        $limit = 6;
+        $offset = $limit*$requestData['page'];
+        $userArticles = $requestData['userArticles'];
+        $userId = $requestData['userId'];
+        if($userArticles == false){
+            $category = $requestData['category'];
+            $styles = $requestData['styles'];
+            $onlyMyArticles = $requestData['onlyMyArticles'];
+            
+            $s0 = "";
+            $s1 = "";
+            $s2 = "";
+            if($styles[0]['value'] == true) $s0 = $styles[0]['key'];
+            if($styles[1]['value'] == true) $s1 = $styles[1]['key'];
+            if($styles[2]['value'] == true) $s2 = $styles[2]['key'];
+
+            
+            if($category != ""){
+                if($onlyMyArticles == false){
+                    $sql = "SELECT * FROM articles WHERE tag = \"$category\"
+                    AND (style = \"$s0\" OR style = \"$s1\" OR style = \"$s2\")
+                    ORDER BY id DESC LIMIT $limit OFFSET $offset";
+                }
+                else {
+                    $sql = "SELECT * FROM articles WHERE userId = $userId AND tag = \"$category\"
+                    AND (style = \"$s0\" OR style = \"$s1\" OR style = \"$s2\")
+                    ORDER BY id DESC LIMIT $limit OFFSET $offset";
+                }
+            }
+            else {
+                if($onlyMyArticles == false){
+                    $sql = "SELECT * FROM articles WHERE
+                    style = \"$s0\" OR style = \"$s1\" OR style = \"$s2\"
+                    ORDER BY id DESC LIMIT $limit OFFSET $offset";
+                }
+                else {
+                    $sql = "SELECT * FROM articles WHERE userId = $userId AND
+                    (style = \"$s0\" OR style = \"$s1\" OR style = \"$s2\")
+                    ORDER BY id DESC LIMIT $limit OFFSET $offset";
+                }
+            }
+        }
+        else {
+            $sql = "SELECT * FROM articles WHERE userId = $userId ORDER BY id DESC LIMIT $limit OFFSET $offset";
+        }
         $result = $conn->query($sql);
         $array = [];
 
@@ -35,34 +186,35 @@ $app->get('/api/articles',
         return $response->withJson($array);
     }
 );
-$app->get('/api/users/{userId}/articles',
-    function (Request $request, Response $response, array $args) {
-        $servername = "serwer2001916.home.pl";
-        $username = "32213694_scoreboard";
-        $password = "Fell!Dell!=";
-        $dbname = "32213694_scoreboard";
-        // Create connection
-        $conn = new mysqli($servername, $username, $password, $dbname);
-        // Check connection
-        if ($conn->connect_error) {
-            die("Connection failed: " . $conn->connect_error);
-        }
-        $userId = $args['userId'];
-        $sql = "SELECT * FROM articles WHERE userId = $userId ORDER BY id DESC";
-        $result = $conn->query($sql);
-        $array = [];
+$app->post('/api/article/delete',
+     function (Request $request, Response $response, array $args) {
 
-        if ($result->num_rows > 0) {
-            // output data of each row
-            while($row = $result->fetch_assoc()) {
-                $array[] = $row;
-            }
-        } else {
-            echo "0 results";
-        }
-        $conn->close();
-        return $response->withJson($array);
-    }
+      $servername = "serwer2001916.home.pl";
+      $username = "32213694_scoreboard";
+      $password = "Fell!Dell!=";
+      $dbname = "32213694_scoreboard";
+
+      $requestData = $request->getParsedBody();
+      // Create connection
+      $conn = new mysqli($servername, $username, $password, $dbname);
+      // Check connection
+      if ($conn->connect_error) {
+          die("Connection failed: " . $conn->connect_error);
+      }
+      $id = $requestData['id'];
+
+      $sql = "DELETE FROM articles WHERE id = $id";
+
+      if ($conn->query($sql) === TRUE) {
+          echo "New record created successfully";
+      } else {
+          echo "Error: " . $sql . "<br>" . $conn->error;
+      }
+
+      $conn->close();
+      return $requestData;
+  }
+
 );
 $app->get('/api/articles/{articleId}/rating/user/{userId}',
     function (Request $request, Response $response, array $args) {

@@ -19,6 +19,8 @@ import 'vue-material/dist/vue-material.min.css'
 import 'vue-material/dist/theme/default.css'
 
 import StarRating from 'vue-star-rating'
+import infiniteScroll from 'vue-infinite-scroll'
+Vue.use(infiniteScroll)
 
 
 

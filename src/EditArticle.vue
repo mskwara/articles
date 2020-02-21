@@ -1,6 +1,9 @@
 <template>
   <div id="writing">
-    <h3>Edytujesz właśnie artykuł "<b>{{oldTitle}}</b>"</h3>
+    <div class="header">
+      <h3>Edytujesz właśnie artykuł "<b>{{oldTitle}}</b>"</h3>
+      <button type="button" class="btn btn-danger remove" @click="removing = true">Usuń artykuł</button>
+    </div>
     <form class="form">
       <div class="form-group">
         <input type="text" class="form-control" id="title" aria-describedby="titleHelp" v-model="article.title" placeholder="Tytuł">
@@ -45,12 +48,21 @@
         md-title="Coś poszło nie tak..."
         md-content="Wypełnij wszystkie pola przed publikacją!"
         md-confirm-text="Zamknij" />
+
+    <md-dialog-confirm
+        :md-active.sync="removing"
+        md-title="Czy na pewno chcesz usunąć?"
+        md-content="Jeżeli usuniesz artykuł, nie będzie się już go dało odzyskać! Czy chcesz kontynuować?"
+        md-cancel-text="Powrót"
+        md-confirm-text="Usuń artykuł"
+        @md-confirm="definitelyRemove" />
   </div>
 </template>
 
 <script>
 import categories from "./categories.js";
 import writing_styles from "./writing_styles.js";
+import { EventBus } from './event-bus.js';
 
 export default {
   name: 'writing',
@@ -65,6 +77,7 @@ export default {
       alertText: "",
       failed: false,
       oldTitle: "",
+      removing: false,
     }
   },
   mounted(){
@@ -93,6 +106,13 @@ export default {
       else {
         this.failed = true;
       }
+    },
+    definitelyRemove(){
+      this.$http.post('article/delete', this.article).then(()=>{
+        var onlyMyArticles = false;
+        this.$router.push({ name: 'articles', params: { onlyMyArticles: onlyMyArticles }});
+        EventBus.$emit('all-articles');
+      });
     }
   },
 }
@@ -136,6 +156,14 @@ small {
 .form {
   display: flex;
   flex-direction: column;
+}
+.header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+.remove {
+  height: 40px;
 }
 @keyframes animationPop {
   from {opacity: 0}

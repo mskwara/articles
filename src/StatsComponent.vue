@@ -6,7 +6,8 @@
   <div class="page" v-if="!loading">
     <div class="container">
       <div class="ratingArea">
-        <p class="info">Tak inni Cię oceniali</p>
+        <p class="info" v-if="current">Tak inni Cię oceniali</p>
+        <p class="info" v-else>Średnia ocen</p>
         <h1 class="averageRating">{{averageRating}}</h1>
         <star-rating class="avgRating" :rating="parseFloat(averageRating)" :read-only="true" :increment="0.01" :star-size="20" :show-rating="false"
            :border-width="4" border-color="#d8d8d8" :rounded-corners="true"
@@ -19,7 +20,7 @@
           </div>
         </div>
       </div>
-      <div class="articlesStats">
+      <div class="articlesStats" v-if="current">
         % Twoich artykułów
         <div class="progress progressPercent">
           <div class="progress-bar bg-success" role="progressbar" :style="getArticleProgressStyle(globalRating.articles.yourArticles, globalRating.articles.allArticles)" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
@@ -31,17 +32,41 @@
           <div class="statsInfo" v-if="globalRating.articles.yourArticles >= 5">Napisałeś <b>{{globalRating.articles.yourArticles}}</b> artykułów.</div>
           <div class="statsInfo" v-if="globalRating.articles.yourArticles >= 2 && globalRating.articles.yourArticles <= 4">Napisałeś <b>{{globalRating.articles.yourArticles}}</b> artykuły.</div>
           <div class="statsInfo" v-if="globalRating.articles.yourArticles == 1">Napisałeś <b>{{globalRating.articles.yourArticles}}</b> artykuł.</div>
-          <div class="statsInfo" v-if="globalRating.articles.yourArticles == 0">Nie napisałeś jeszcze artykułu.</div>
+          <div class="statsInfo" v-if="globalRating.articles.yourArticles == 0">Nie napisał/a jeszcze artykułu.</div>
 
           <div class="statsInfo" v-if="globalRating.comments.yourComments >= 5">Zamieściłeś <b>{{globalRating.comments.yourComments}}</b> komentarzy.</div>
           <div class="statsInfo" v-if="globalRating.comments.yourComments >= 2 && globalRating.comments.yourComments <= 4">Zamieściłeś <b>{{globalRating.comments.yourComments}}</b> komentarze.</div>
           <div class="statsInfo" v-if="globalRating.comments.yourComments == 1">Zamieściłeś <b>{{globalRating.comments.yourComments}}</b> komentarz.</div>
-          <div class="statsInfo" v-if="globalRating.comments.yourComments == 0">Nic jeszcze nie skomentowałeś.</div>
+          <div class="statsInfo" v-if="globalRating.comments.yourComments == 0">Nic jeszcze nie skomentował/a.</div>
 
           <div class="statsInfo" v-if="globalRating.yourRatings >= 5">Oceniłeś <b>{{globalRating.yourRatings}}</b> artykułów.</div>
           <div class="statsInfo" v-if="globalRating.yourRatings >= 2 && globalRating.yourRatings <= 4">Oceniłeś <b>{{globalRating.yourRatings}}</b> artykuły.</div>
           <div class="statsInfo" v-if="globalRating.yourRatings == 1">Oceniłeś <b>{{globalRating.yourRatings}}</b> artykuł.</div>
           <div class="statsInfo" v-if="globalRating.yourRatings == 0">Nie oceniłeś jeszcze żadnego artykułu.</div>
+      </div>
+      <div class="articlesStats" v-else>
+        % artykułów
+        <div class="progress progressPercent">
+          <div class="progress-bar bg-success" role="progressbar" :style="getArticleProgressStyle(globalRating.articles.yourArticles, globalRating.articles.allArticles)" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
+        </div>
+        % komentarzy
+        <div class="progress progressPercent">
+          <div class="progress-bar bg-warning" role="progressbar" :style="getArticleProgressStyle(globalRating.comments.yourComments, globalRating.comments.allComments)" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
+        </div>
+          <div class="statsInfo" v-if="globalRating.articles.yourArticles >= 5">Napisał/a <b>{{globalRating.articles.yourArticles}}</b> artykułów.</div>
+          <div class="statsInfo" v-if="globalRating.articles.yourArticles >= 2 && globalRating.articles.yourArticles <= 4">Napisał/a <b>{{globalRating.articles.yourArticles}}</b> artykuły.</div>
+          <div class="statsInfo" v-if="globalRating.articles.yourArticles == 1">Napisał/a <b>{{globalRating.articles.yourArticles}}</b> artykuł.</div>
+          <div class="statsInfo" v-if="globalRating.articles.yourArticles == 0">Nie napisał/a jeszcze artykułu.</div>
+
+          <div class="statsInfo" v-if="globalRating.comments.yourComments >= 5">Zamieścił/a <b>{{globalRating.comments.yourComments}}</b> komentarzy.</div>
+          <div class="statsInfo" v-if="globalRating.comments.yourComments >= 2 && globalRating.comments.yourComments <= 4">Zamieścił/a <b>{{globalRating.comments.yourComments}}</b> komentarze.</div>
+          <div class="statsInfo" v-if="globalRating.comments.yourComments == 1">Zamieścił/a <b>{{globalRating.comments.yourComments}}</b> komentarz.</div>
+          <div class="statsInfo" v-if="globalRating.comments.yourComments == 0">Nic jeszcze nie skomentował/a.</div>
+
+          <div class="statsInfo" v-if="globalRating.yourRatings >= 5">Ocenił/a <b>{{globalRating.yourRatings}}</b> artykułów.</div>
+          <div class="statsInfo" v-if="globalRating.yourRatings >= 2 && globalRating.yourRatings <= 4">Ocenił/a <b>{{globalRating.yourRatings}}</b> artykuły.</div>
+          <div class="statsInfo" v-if="globalRating.yourRatings == 1">Ocenił/a <b>{{globalRating.yourRatings}}</b> artykuł.</div>
+          <div class="statsInfo" v-if="globalRating.yourRatings == 0">Nie ocenił/a jeszcze żadnego artykułu.</div>
       </div>
     </div>
   </div>
@@ -65,6 +90,7 @@ export default {
   },
   props: {
     userId: Number,
+    current: Boolean, 
   },
   mounted(){
     this.$http.get('users/'+this.userId+'/articles/statistics').then(response => {

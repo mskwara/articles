@@ -89,6 +89,12 @@ export default {
     EventBus.$on('give-me-filters', () => {
       EventBus.$emit('filter', this.filter);
     });
+    EventBus.$on('clear-filters', () => {
+      this.filter.category = "";
+      this.filter.loose = true;
+      this.filter.serious = true;
+      this.filter.funny = true;
+    });
   }
 }
 </script>

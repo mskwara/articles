@@ -17,7 +17,7 @@
           <input type="email" class="form-control" placeholder="Email" v-model="user.email" required>
         </div>
         <div class="form-group">
-          <textarea type="text" class="form-control" placeholder="Opis" aria-describedby="descriptionHelp" v-model="user.description"></textarea>
+          <textarea type="text" class="form-control" placeholder="Opis" rows="5" aria-describedby="descriptionHelp" v-model="user.description"></textarea>
           <small id="descriptionHelp" class="form-text text-muted">Zaktualizuj swój opis</small>
         </div>
 
@@ -222,7 +222,7 @@ h3 {
 
 }
 .form {
-  width: 50%;
+  width: 60%;
   text-align: left;
 }
 .avatar {

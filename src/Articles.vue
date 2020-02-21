@@ -1,6 +1,6 @@
 <template>
+<div v-infinite-scroll="appendToArticles" infinite-scroll-disabled="busy" infinite-scroll-distance="10">
   <div id="articlesName">
-
       <div class="chips">
         <md-chip class="md-accent chip" v-if="filter.category != ''">{{ getLabelForCategory(filter.category) }}</md-chip>
         <md-chip class="md-accent chip" v-else>Wszystkie</md-chip>
@@ -9,24 +9,33 @@
         </div>
       </div>
       <transition name="fade">
-        <div v-if="articlesFiltered.length == 0 && !loading && !onlyMyArticles">
+        <div v-if="articles.length == 0 && !loading && !filter.onlyMyArticles">
           Nikt nie napisał jeszcze żadnego artykułu o wybranych kryteriach.
         </div>
-        <div v-if="articlesFiltered.length == 0 && !loading && onlyMyArticles">
+        <div v-if="articles.length == 0 && !loading && filter.onlyMyArticles">
           Nie napisałeś jeszcze żadnego artykułu o wybranych kryteriach.
         </div>
       </transition>
-      <div class="spinner-border text-primary" role="status" v-if="loading">
-        <span class="sr-only">Loading...</span>
-      </div>
+      
       <div v-if="articles.length > 0">
-        <div class="article" :key="article.id" v-for="article in articlesFiltered">
+        <div class="article" :key="article.id" v-for="article in articles">
           <article-short :article="article"></article-short>
         </div>
       </div>
-      
-      
+      <div class="spinner-border text-primary" role="status" v-if="loading">
+        <span class="sr-only">Loading...</span>
+      </div>
+    
+    </div>
 
+    <md-dialog-confirm
+        :md-active.sync="newArticlesToLoad"
+        md-title="Mamy coś nowego!"
+        md-content="Ktoś właśnie napisał nowy artykuł."
+        md-cancel-text="Później"
+        @md-cancel="getCurrentCount"
+        md-confirm-text="Chcę zobaczyć"
+        @md-confirm="reloadPage" />
   </div>
 </template>
 
@@ -63,48 +72,66 @@ export default {
             value: true,
             key: "funny"
           },
-        ]
+        ],
+        page: 0,
+        onlyMyArticles: false,
+        userId: service.id,
+        userArticles: false,
       },
-      onlyMyArticles: false,
       onlyMyArticlesImage: "",
       categories: categories.categories,
       writing_styles: writing_styles.writing_styles,
+      busy: false,
+      maxPage: 0,
+      httpArticlesActive: false,
+      httpPageActive: false,
+      articlesCount: 0,
+      newArticlesToLoad: false,
     }
   },
   methods: {
     getArticles(){
-      this.$http.get('articles').then(response => {
+      this.$http.post('articles', this.filter).then(response => {
         if(response.body != null){
           this.articles = response.body;
-          this.filterArray();
-          if(this.onlyMyArticles == true){
-            this.articlesFiltered = this.articlesFiltered.filter(function(article) {
-              return article.userId == service.id;
-            });
-            this.onlyMyArticlesImage = service.avatar;
-          }
+          //this.filterArray();
+          // if(this.onlyMyArticles == true){
+          //   this.articlesFiltered = this.articlesFiltered.filter(function(article) {
+          //     return article.userId == service.id;
+          //   });
+          //   this.onlyMyArticlesImage = service.avatar;
+          // }
         }
         else this.articles = [];
         this.loading = false;
       });
+      this.filter.page++;
     },
-    filterArray(){
-      var s0 = "";
-      var s1 = "";
-      var s2 = "";
-      if(this.filter.styles[0].value == true) s0 = this.filter.styles[0].key;
-      if(this.filter.styles[1].value == true) s1 = this.filter.styles[1].key;
-      if(this.filter.styles[2].value == true) s2 = this.filter.styles[2].key;
-      var cat = this.filter.category;
-      if(cat != ""){
-        this.articlesFiltered = this.articles.filter(function(article) {
-          return article.tag == cat && (article.style == s0 || article.style == s1 || article.style == s2);
+    appendToArticles(){
+      if(this.filter.page <= this.maxPage && !this.httpArticlesActive){
+        this.loading = true;
+        this.httpArticlesActive = true;
+        this.busy = true;
+        this.$http.post('articles', this.filter).then(response => {
+          if(response.body != null){
+            for(var i = 0 ; i < response.body.length ; i++){
+              this.articles.push(response.body[i]);
+            }
+            
+          }
+          // else this.articles = [];
+          this.loading = false;
+          this.httpArticlesActive = false;
+          this.filter.page++;
+          setTimeout(()=>{
+            this.busy = false; 
+        },1000);
         });
+      
       }
-      else {
-        this.articlesFiltered = this.articles.filter(function(article) {
-          return article.style == s0 || article.style == s1 || article.style == s2;
-        });
+      if(this.maxPage == -1){
+        this.articles = [];
+        this.loading = false;
       }
     },
     getLabelForCategory(key){
@@ -121,39 +148,110 @@ export default {
         }
       }
     },
+    getMaxPageAndArticles(){
+      if(this.httpPageActive == false){
+        this.httpPageActive = true;
+        this.$http.post('articles/maxPage', this.filter).then(response => {
+          if(response.body != null) this.maxPage = response.body;
+          else  this.maxPage = -1;
+
+          this.httpPageActive = false;
+          this.appendToArticles();
+        });
+      }
+    },
+    getNewCount(){
+      this.$http.get('articles/count').then(response => {
+        var newCount = 0;
+        if(response.body != null){
+          newCount = response.body;
+        }
+        else  newCount = 0;
+
+        if(newCount > this.articlesCount){
+          this.newArticlesToLoad = true;
+        }
+      });
+    },
+    getCurrentCount(){
+      this.$http.get('articles/count').then(response => { //ile jest wszyskich artykulow
+        if(response.body != null){
+          this.articlesCount = response.body;
+        }
+        else  this.articlesCount = 0;
+      });
+    },
+    reloadPage(){
+      this.articles = [];
+      EventBus.$emit('clear-filters');
+      this.filter.onlyMyArticles = false;
+      this.filter.page = 0;
+      EventBus.$emit('give-me-filters');
+
+      this.getCurrentCount();
+    }
   },
   mounted(){
-    this.onlyMyArticles = this.$route.params.onlyMyArticles;
-    this.getArticles();
-    this.getArticlesInterval = setInterval(this.getArticles, 10000);
+    if(this.$route.params.onlyMyArticles != null){
+      this.filter.onlyMyArticles = this.$route.params.onlyMyArticles;
+    }
+    this.getCurrentCount();
+    
+    this.filter.userArticles = false;
+    this.filter.userId = service.id;
+    this.filter.page = 0;
+    //this.getArticles();
+    this.getNewArticlesInterval = setInterval(this.getNewCount, 10000);
+    this.getMaxPageAndArticles();
 
     EventBus.$on('filter', ({category, loose, serious, funny}) => {
+      this.loading = true;
       this.filter.category = category;
       this.filter.styles[0].value = loose;
       this.filter.styles[1].value = serious;
       this.filter.styles[2].value = funny;
-      this.filterArray();
-      if(this.onlyMyArticles){
-        this.articlesFiltered = this.articlesFiltered.filter(function(article) {
-          return article.userId == service.id;
-        });
-      }
+      this.articles = [];
+      this.filter.page = 0;
+      this.busy = true;
+      this.getMaxPageAndArticles();
+      //this.appendToArticles();
+      //this.getArticles();
+      // this.filterArray();
+      // if(this.onlyMyArticles){
+      //   this.articlesFiltered = this.articlesFiltered.filter(function(article) {
+      //     return article.userId == service.id;
+      //   });
+      // }
     });
     EventBus.$on('only-my-articles', () => {
-      this.onlyMyArticles = true;
-      this.articlesFiltered = this.articlesFiltered.filter(function(article) {
-        return article.userId == service.id;
-      });
+      this.loading = true;
+      this.filter.onlyMyArticles = true;
+      this.articles = [];
+      this.filter.page = 0;
+      this.busy = true;
+      this.getMaxPageAndArticles();
+      //this.appendToArticles();
+      //this.getArticles();
+      // this.articlesFiltered = this.articlesFiltered.filter(function(article) {
+      //   return article.userId == service.id;
+      // });
     });
     EventBus.$on('all-articles', () => {
-      this.onlyMyArticles = false;
-      this.filterArray();
+      this.loading = true;
+      this.filter.onlyMyArticles = false;
+      this.articles = [];
+      this.filter.page = 0;
+      this.busy = true;
+      this.getMaxPageAndArticles();
+      //this.appendToArticles();
+      //this.getArticles();
+      //this.filterArray();
     });
 
     EventBus.$emit('give-me-filters');
   },
   destroyed(){
-    clearInterval(this.getArticlesInterval);
+    clearInterval(this.getNewArticlesInterval);
   }
 }
 </script>

@@ -2,7 +2,7 @@
 <div id="statistics">
   <div class="page">
     <h3>Twoje statystyki</h3>
-    <stats-component :userId="userId"></stats-component>
+    <stats-component :userId="userId" :current="true"></stats-component>
   </div>
 </div>
 </template>

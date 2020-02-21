@@ -61,6 +61,9 @@ export default {
       clearInterval(this.checkingIfUserExists);
     });
   },
+  destroyed(){
+    clearInterval(this.checkingIfUserExists);
+  }
 }
 </script>
 
