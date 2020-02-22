@@ -124,6 +124,7 @@ overflow: hidden;
 a {
   cursor: pointer;
   padding-bottom: 0 !important;
+  padding-top: 0.4rem !important;
 }
 .custom-checkbox {
   margin-left: 20px;

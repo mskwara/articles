@@ -21,6 +21,10 @@ const categories = {
       key: "books"
     },
     {
+      label: "Kuchnia",
+      key: "kitchen"
+    },
+    {
       label: "Nauki humanistyczne",
       key: "humanities"
     },

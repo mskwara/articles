@@ -187,32 +187,66 @@ $app->post('/api/articles',
     }
 );
 $app->post('/api/article/delete',
-     function (Request $request, Response $response, array $args) {
+    function (Request $request, Response $response, array $args) {
 
-      $servername = "serwer2001916.home.pl";
-      $username = "32213694_scoreboard";
-      $password = "Fell!Dell!=";
-      $dbname = "32213694_scoreboard";
+    $servername = "serwer2001916.home.pl";
+    $username = "32213694_scoreboard";
+    $password = "Fell!Dell!=";
+    $dbname = "32213694_scoreboard";
 
-      $requestData = $request->getParsedBody();
-      // Create connection
-      $conn = new mysqli($servername, $username, $password, $dbname);
-      // Check connection
-      if ($conn->connect_error) {
-          die("Connection failed: " . $conn->connect_error);
-      }
-      $id = $requestData['id'];
+    $requestData = $request->getParsedBody();
+    // Create connection
+    $conn = new mysqli($servername, $username, $password, $dbname);
+    // Check connection
+    if ($conn->connect_error) {
+        die("Connection failed: " . $conn->connect_error);
+    }
+    $id = $requestData['id'];
 
-      $sql = "DELETE FROM articles WHERE id = $id";
+    $sql = "DELETE FROM articles WHERE id = $id";
 
-      if ($conn->query($sql) === TRUE) {
-          echo "New record created successfully";
-      } else {
-          echo "Error: " . $sql . "<br>" . $conn->error;
-      }
+    if ($conn->query($sql) === TRUE) {        //usuwanie artykułu
+        echo "Article deleted successfully";
+    } else {
+        echo "Error: " . $sql . "<br>" . $conn->error;
+    }
+    
+    $sql1 = "DELETE FROM rating WHERE articleId = $id";
 
-      $conn->close();
-      return $requestData;
+    if ($conn->query($sql1) === TRUE) {       //usuwanie ocen
+        echo "Rating deleted successfully";
+    } else {
+        echo "Error: " . $sql1 . "<br>" . $conn->error;
+    }
+    
+    $sql2 = "SELECT id FROM comments WHERE articleId = $id";
+
+    $commentsIds = [];
+    $result = $conn->query($sql2);        //wzięcie id komentarzy
+    if ($result->num_rows > 0) {
+        while($row = $result->fetch_assoc()) {
+            $commentsIds[] = $row['id'];
+        }
+    }
+
+    $sql3 = 'DELETE FROM likes WHERE objId IN (' . implode(',', array_map('intval', $commentsIds)) . ')';
+
+    if ($conn->query($sql3) === TRUE) {       //usuwanie lików
+        echo "Likes deleted successfully";
+    } else {
+        echo "Error: " . $sql3 . "<br>" . $conn->error;
+    }
+    
+    $sql4 = "DELETE FROM comments WHERE articleId = $id";
+
+    if ($conn->query($sql4) === TRUE) {       //usuwanie lików
+        echo "Comments deleted successfully";
+    } else {
+        echo "Error: " . $sql4 . "<br>" . $conn->error;
+    }
+
+    $conn->close();
+    return $requestData;
   }
 
 );
@@ -806,7 +840,8 @@ $app->post('/api/comments/add',
       return $requestData;
   }
 
-);$app->post('/api/comments/delete',
+);
+$app->post('/api/comments/delete',
      function (Request $request, Response $response, array $args) {
 
       $servername = "serwer2001916.home.pl";
@@ -825,9 +860,17 @@ $app->post('/api/comments/add',
       $sql = "DELETE FROM comments WHERE id = $id";
 
       if ($conn->query($sql) === TRUE) {
-          echo "New record created successfully";
+          echo "Comment deleted successfully";
       } else {
           echo "Error: " . $sql . "<br>" . $conn->error;
+      }
+      
+      $sql1 = "DELETE FROM likes WHERE objId = $id";
+
+      if ($conn->query($sql1) === TRUE) {
+          echo "Likes deleted successfully";
+      } else {
+          echo "Error: " . $sql1 . "<br>" . $conn->error;
       }
 
       $conn->close();
