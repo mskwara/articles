@@ -677,11 +677,33 @@ $app->post('/api/validateLogin',
         }
         $conn->close();
         if($finish){
-          return "true";
+            $wynik = "true";
+            return $wynik;
         }
         else {
-          return "false";
+            $wynik = "false";
+            return $wynik;
         }
+        //return $response->withJson($array);
+    }
+);
+$app->post('/api/warmup',
+    function (Request $request, Response $response, array $args) {
+        $servername = "serwer2001916.home.pl";
+        $username = "32213694_scoreboard";
+        $password = "Fell!Dell!=";
+        $dbname = "32213694_scoreboard";
+
+        $requestData = $request->getParsedBody();
+        // Create connection
+        $conn = new mysqli($servername, $username, $password, $dbname);
+        // Check connection
+        if ($conn->connect_error) {
+            die("Connection failed: " . $conn->connect_error);
+        }
+        
+        $conn->close();
+        return "true";
         //return $response->withJson($array);
     }
 );

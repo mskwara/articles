@@ -13,23 +13,19 @@ export default {
   },
   data(){
     return {
-      authenticated: false,
     }
   },
   mounted(){
     if(!service.authenticated) {
-        this.$router.replace({ name: "login" });
+        this.$router.replace({ name: "login" }).catch(() => {});
     }
     else {
-      this.$router.replace({ name: "home" });
+      this.$router.replace({ name: "home" }).catch(() => {});
     }
   },
   methods: {
       setAuthenticated(status) {
           service.authenticated = status;
-      },
-      logout() {
-          this.authenticated = false;
       },
 
   }

@@ -2,7 +2,7 @@
 <div id="login">
   <h3>Zaloguj się</h3>
   <div class="container">
-    <form>
+    <form v-on:submit.prevent="login()">
       <div class="form-group">
         <input type="text" class="form-control" placeholder="Nick" v-model="input.nick" required>
       </div>
@@ -11,12 +11,17 @@
         <input type="password" class="form-control" placeholder="Hasło" v-model="input.password" required>
       </div>
       <div class="buttons">
-        <button type="submit" class="btn btn-primary" @click="login()">Zaloguj</button>
+        <button class="btn btn-primary">Zaloguj</button>
         <a @click="goToRegister()">Nie masz konta?</a>
       </div>
     </form>
+    
     <div class="spinner-border text-primary loading" role="status" v-if="loading">
       <span class="sr-only">Loading...</span>
+    </div>
+    <div class="warning" v-if="screenSizeAlert">
+      <h4>Uwaga!</h4>
+      <p>Ze względu na niekompatybilny rozmiar ekranu treści na stronie mogą nie wyświetlać się prawidłowo.</p>
     </div>
 
   </div>
@@ -26,12 +31,6 @@
       md-title="Coś poszło nie tak..."
       :md-content="failedText"
       md-confirm-text="Zamknij" />
-
-  <md-dialog-alert class="warning"
-      :md-active.sync="screenSizeAlert"
-      md-title="Uwaga!"
-      md-content="Ze względu na niekompatybilny rozmiar ekranu treści na stronie mogą nie wyświetlać się prawidłowo."
-      md-confirm-text="Rozumiem" />
 
 </div>
 </template>
@@ -64,6 +63,7 @@ export default {
     if(this.windowWidth < 1265 || this.windowHeight < 700){
       this.screenSizeAlert = true;
     }
+    this.$http.post('warmup');
   },
   methods: {
     login() {
@@ -72,12 +72,13 @@ export default {
         this.$http.post('validateLogin', this.input).then(response => {
           if(response.body == "true"){
               this.$emit("authenticated", true);
-
+              service.authenticated = true;
+              
               this.$http.get('users/'+this.input.nick).then(response => {
                 this.setLoggedUser(response.body[0].id, response.body[0].nick, response.body[0].name,
                    response.body[0].surname, response.body[0].email, response.body[0].description, response.body[0].avatar);
                 this.loading = false;
-                this.$router.replace({ name: "home" });
+                this.$router.replace({ name: "home" }).catch(() => {});
               });
           } else {
               this.failedText = "Wpisałeś niepoprawny nick lub hasło!";
@@ -86,11 +87,13 @@ export default {
               this.input.password = "";
               this.loading = false;
           }
+        }).catch(error => {
+          alert(error);
         });
       } else {
-        this.failedText = "Uzupełnij wszystkie pola żeby się zalogować!";
+       this.failedText = "Uzupełnij wszystkie pola żeby się zalogować!";
         this.failed = true;
-        this.loading = false;
+       this.loading = false;
       }
     },
     goToRegister(){
@@ -145,7 +148,12 @@ a {
   border-radius: 10px;
 }
 .warning {
-  border: 2px solid yellow !important;
-  border-radius: 10px;
+  border: 1px solid gray;
+  border-radius: 3px;
+  background-color: rgb(255, 255, 212);
+  width: 400px;
+  height: auto;
+  padding: 10px;
+  margin-top: 30px;
 }
 </style>
