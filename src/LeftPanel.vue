@@ -102,12 +102,11 @@ export default {
 <style scoped>
 
 #lefter {
-font-family: 'Avenir', Helvetica, Arial, sans-serif;
--webkit-font-smoothing: antialiased;
--moz-osx-font-smoothing: grayscale;
-text-align: left;
-color: #2c3e50;
-overflow: hidden;
+  font-family: 'Avenir', Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-align: left;
+  color: #2c3e50;
 }
 .leftPanel {
   width: 250px;
@@ -116,6 +115,7 @@ overflow: hidden;
   border-right: 1px solid gray;
   background-color: #fafafa;
   position: fixed;
+  overflow: auto;
 }
 .header {
   padding-top: 10px;

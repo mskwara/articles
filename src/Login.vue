@@ -27,6 +27,12 @@
       :md-content="failedText"
       md-confirm-text="Zamknij" />
 
+  <md-dialog-alert class="warning"
+      :md-active.sync="screenSizeAlert"
+      md-title="Uwaga!"
+      md-content="Ze względu na niekompatybilny rozmiar ekranu treści na stronie mogą nie wyświetlać się prawidłowo."
+      md-confirm-text="Rozumiem" />
+
 </div>
 </template>
 
@@ -46,10 +52,18 @@ export default {
       failed: false,
       failedText: "",
       loading: false,
+      windowWidth: 0,
+      windowHeight: 0,
+      screenSizeAlert: false,
     }
   },
   mounted(){
     service.authenticated = false;
+    this.windowWidth = window.innerWidth;
+    this.windowHeight = window.innerHeight;
+    if(this.windowWidth < 1265 || this.windowHeight < 700){
+      this.screenSizeAlert = true;
+    }
   },
   methods: {
     login() {
@@ -128,6 +142,10 @@ a {
 }
 .error {
   border: 2px solid red !important;
+  border-radius: 10px;
+}
+.warning {
+  border: 2px solid yellow !important;
   border-radius: 10px;
 }
 </style>

@@ -50,6 +50,7 @@ export default {
     }
   },
   mounted(){
+    
     if(!service.authenticated) {
         this.$router.replace({ name: "login" });
     }
