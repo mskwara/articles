@@ -26,9 +26,9 @@
         </li>
       </ul>
       <a class="nav-link logout" @click="logout()">Wyloguj</a>
-      <form class="form-inline my-2 my-lg-0">
+      <form class="form-inline my-2 my-lg-0" v-on:submit.prevent="search()">
         <input class="form-control mr-sm-2" type="search" placeholder="Wpisz szukaną frazę" aria-label="Search" v-model="searchPhrase">
-        <button class="btn btn-outline-warning my-2 my-sm-0" type="submit" :disabled="searchPhrase == ''" @click="search">Szukaj</button>
+        <button class="btn btn-outline-warning my-2 my-sm-0" type="submit" :disabled="searchPhrase == ''">Szukaj</button>
       </form>
     </div>
   </nav>

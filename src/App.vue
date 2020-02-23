@@ -17,7 +17,7 @@ export default {
   },
   mounted(){
     if(!service.authenticated) {
-        this.$router.replace({ name: "login" }).catch(() => {});
+      this.$router.replace({ name: "login" }).catch(() => {});
     }
     else {
       this.$router.replace({ name: "home" }).catch(() => {});

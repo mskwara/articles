@@ -4,7 +4,7 @@
   <div class="container">
     <div class="form">
       <h3>Twój profil</h3>
-      <form>
+      <form v-on:submit.prevent="applying = true">
         <div class="form-row">
           <div class="col">
             <input type="text" class="form-control" placeholder="Imię" v-model="user.name" disabled>
@@ -40,7 +40,7 @@
           <input type="password" class="form-control" placeholder="Nowe hasło" v-model="user.newPassword">
         </div>
         <div class="buttons">
-          <button type="submit" class="btn btn-primary" @click="applying = true">Zaktualizuj dane</button>
+          <button type="submit" class="btn btn-primary">Zaktualizuj dane</button>
         </div>
       </form>
     </div>

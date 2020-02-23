@@ -4,7 +4,7 @@
   <div class="container">
     <div class="form">
 
-      <form>
+      <form v-on:submit.prevent="register()">
         <div class="form-row">
           <div class="col">
             <input type="text" class="form-control" placeholder="Imię" v-model="newUser.name">
@@ -40,7 +40,7 @@
           <input type="password" class="form-control" placeholder="Hasło" v-model="newUser.password">
         </div>
         <div class="buttons">
-          <button type="submit" class="btn btn-primary" @click="register()">Zarejestruj</button>
+          <button type="submit" class="btn btn-primary">Zarejestruj</button>
           <a @click="goToLogin()">Masz już konto?</a>
         </div>
       </form>

@@ -1,7 +1,7 @@
 <template>
   <div id="writing">
     <h3>Napisz nowy artykuł</h3>
-    <form class="form">
+    <form class="form" v-on:submit.prevent="publish()">
       <div class="form-group">
         <input type="text" class="form-control" id="title" aria-describedby="titleHelp" v-model="article.title" placeholder="Tytuł">
         <small id="titleHelp" class="form-text text-muted">Podaj chwytny tytuł, który zaciekawi odbiorców.</small>
@@ -34,7 +34,7 @@
           </div>
         </div>
       </div>
-      <button type="button" class="btn btn-primary publish" @click="publish()">Opublikuj</button>
+      <button type="submit" class="btn btn-primary publish">Opublikuj</button>
     </form>
 
     <md-dialog-alert class="success"

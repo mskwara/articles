@@ -109,13 +109,16 @@ export default {
   color: #2c3e50;
 }
 .leftPanel {
-  width: 250px;
-  min-width: 200px;
-  height: 100vh;
-  border-right: 1px solid gray;
+  height: 100%; /* Full-height: remove this if you want "auto" height */
+  width: 250px; /* Set the width of the sidebar */
+  position: fixed; /* Fixed Sidebar (stay in place on scroll) */
+  z-index: 1; /* Stay on top */
+  top: 0; /* Stay at the top */
+  left: 0;
   background-color: #fafafa;
-  position: fixed;
-  overflow: auto;
+  overflow-x: hidden; /* Disable horizontal scroll */
+  padding-top: 60px;
+  border-right: 1px solid gray;
 }
 .header {
   padding-top: 10px;
@@ -139,6 +142,7 @@ a {
 .reset {
   font-size: 9pt;
   text-align: center !important;
+  padding-bottom: 20px;
 }
 .checkboxes {
   margin-bottom: 20px;

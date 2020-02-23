@@ -11,7 +11,7 @@
         <input type="password" class="form-control" placeholder="Hasło" v-model="input.password" required>
       </div>
       <div class="buttons">
-        <button class="btn btn-primary">Zaloguj</button>
+        <button type="submit" class="btn btn-primary">Zaloguj</button>
         <a @click="goToRegister()">Nie masz konta?</a>
       </div>
     </form>
@@ -60,10 +60,9 @@ export default {
     service.authenticated = false;
     this.windowWidth = window.innerWidth;
     this.windowHeight = window.innerHeight;
-    if(this.windowWidth < 1265 || this.windowHeight < 700){
+    if(this.windowWidth < 1265){
       this.screenSizeAlert = true;
     }
-    this.$http.post('warmup');
   },
   methods: {
     login() {

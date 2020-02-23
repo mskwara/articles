@@ -4,7 +4,7 @@
       <h3>Edytujesz właśnie artykuł "<b>{{oldTitle}}</b>"</h3>
       <button type="button" class="btn btn-danger remove" @click="removing = true">Usuń artykuł</button>
     </div>
-    <form class="form">
+    <form class="form" v-on:submit.prevent="publish()">
       <div class="form-group">
         <input type="text" class="form-control" id="title" aria-describedby="titleHelp" v-model="article.title" placeholder="Tytuł">
         <small id="titleHelp" class="form-text text-muted">Podaj chwytny tytuł, który zaciekawi odbiorców.</small>
@@ -35,7 +35,7 @@
           </div>
         </div>
       </div>
-      <button type="button" class="btn btn-primary publish" @click="publish()">Zakończ edycję</button>
+      <button type="submit" class="btn btn-primary publish">Zakończ edycję</button>
     </form>
 
     <md-dialog-alert class="success"
@@ -102,6 +102,7 @@ export default {
         this.$http.put('article/edit', this.article);
         this.alertText = "Twój artykuł <strong>"+this.oldTitle+"</strong> został pomyślnie zedytowany!."
         this.published = true;
+        this.oldTitle = this.article.title;
       }
       else {
         this.failed = true;
