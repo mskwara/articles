@@ -13,7 +13,7 @@
             <img v-if="image.length > 0" :src="image" class="mr-3 avatar" @click="goToUserInfo(article.article.userId)">
             <img v-else src="./assets/avatar.png" class="mr-3 avatar" @click="goToUserInfo(article.article.userId)">
           </div>
-          <div class="spinner-border text-primary" style="align-self: center ; margin-top: 10px" role="status" v-if="loadingAverageRating && !article.article.ratingDisabled">
+          <div class="spinner-border text-primary" style="align-self: center ; margin-top: 10px" role="status" v-if="loadingAverageRating && article.article.ratingDisabled == 0">
             <span class="sr-only">Loading...</span>
           </div>
           <div class="averageRating" v-if="articleRating != null && !loadingAverageRating && article.article.ratingDisabled == 0">
