@@ -11,7 +11,7 @@
         <input type="password" class="form-control" placeholder="Hasło" v-model="input.password" required>
       </div>
       <div class="buttons">
-        <button type="submit" class="btn btn-primary">Zaloguj</button>
+        <button type="submit" class="btn btn-success">Zaloguj</button>
         <a @click="goToRegister()">Nie masz konta?</a>
       </div>
     </form>
@@ -113,7 +113,7 @@ export default {
 
 <style scoped>
 #login {
-  padding-top: 50px;
+  padding-top: 20px;
 }
 h3 {
   margin-bottom: 20px;

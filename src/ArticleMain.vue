@@ -106,7 +106,7 @@
           <div class="input-group mb-3">
             <textarea class="form-control" rows="2" placeholder="Napisz komentarz..." aria-describedby="button-addon2" v-model="newComment.content" />
             <div class="input-group-append">
-              <button class="btn btn-primary" type="button" id="button-addon2" @click="addComment()">Wyślij</button>
+              <button class="btn btn-success" type="button" id="button-addon2" @click="addComment()">Wyślij</button>
             </div>
           </div>
         </div>

@@ -5,7 +5,7 @@
         <md-chip class="md-accent chip" v-if="filter.category != ''">{{ getLabelForCategory(filter.category) }}</md-chip>
         <md-chip class="md-accent chip" v-else>Wszystkie</md-chip>
         <div :key="style.key" v-for="style in filter.styles">
-          <md-chip class="md-primary chip" v-if="style.value == true">{{ getLabelForStyle(style.key) }}</md-chip>
+          <md-chip class="md-primary chip greenChip" v-if="style.value == true">{{ getLabelForStyle(style.key) }}</md-chip>
         </div>
       </div>
       <transition name="fade">
@@ -281,6 +281,9 @@ export default {
 }
 .chip {
   margin-right: 10px;
+}
+.greenChip {
+  background-color: #1cbd40 !important;
 }
 @keyframes animationPop {
   from {opacity: 0;}

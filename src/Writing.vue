@@ -34,7 +34,7 @@
           </div>
         </div>
       </div>
-      <button type="submit" class="btn btn-primary publish">Opublikuj</button>
+      <button type="submit" class="btn btn-success publish">Opublikuj</button>
     </form>
 
     <md-dialog-alert class="success"

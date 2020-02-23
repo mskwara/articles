@@ -40,7 +40,7 @@
           <input type="password" class="form-control" placeholder="Hasło" v-model="newUser.password">
         </div>
         <div class="buttons">
-          <button type="submit" class="btn btn-primary">Zarejestruj</button>
+          <button type="submit" class="btn btn-success">Zarejestruj</button>
           <a @click="goToLogin()">Masz już konto?</a>
         </div>
       </form>
@@ -213,7 +213,7 @@ export default {
 <style scoped>
 #register {
   text-align: center;
-  padding-top: 50px;
+  padding-top: 20px;
 }
 h3 {
   margin-bottom: 20px;

@@ -24,7 +24,7 @@
         </div>
         <p>{{article.content}}</p>
         <div class="bottom">
-          <button type="button" class="btn btn-primary" @click="goToArticle(article.id)">Czytaj dalej</button>
+          <button type="button" class="btn btn-success" @click="goToArticle(article.id)">Czytaj dalej</button>
 
           <div class="comment" v-if="article.commentsNumber > 0">
             <img src="./assets/comment.svg" />

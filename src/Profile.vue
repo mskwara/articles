@@ -40,7 +40,7 @@
           <input type="password" class="form-control" placeholder="Nowe hasło" v-model="user.newPassword">
         </div>
         <div class="buttons">
-          <button type="submit" class="btn btn-primary">Zaktualizuj dane</button>
+          <button type="submit" class="btn btn-success">Zaktualizuj dane</button>
         </div>
       </form>
     </div>
