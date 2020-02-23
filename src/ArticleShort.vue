@@ -118,6 +118,7 @@ h6 {
 p {
   margin-left: 40px;
   overflow: hidden;
+  white-space: pre-line;
    text-overflow: ellipsis;
    display: -webkit-box;
    -webkit-box-orient: vertical;

@@ -687,6 +687,23 @@ $app->post('/api/validateLogin',
         //return $response->withJson($array);
     }
 );
+$app->post('/api/mail',
+    function (Request $request, Response $response, array $args) {
+        // The message
+        $message = "Line 1\r\nLine 2\r\nLine 3";
+
+        // In case any of our lines are larger than 70 characters, we should use wordwrap()
+        $message = wordwrap($message, 70, "\r\n");
+
+        // Send
+        $success = mail('michalon2000@gmail.com', 'My Subject', $message);
+        if (!$success) {
+            $errorMessage = error_get_last()['message'];
+            echo $errorMessage;
+        }
+        else echo "true";
+    }
+);
 $app->post('/api/validateUniqueNick',
     function (Request $request, Response $response, array $args) {
         $servername = "serwer2001916.home.pl";

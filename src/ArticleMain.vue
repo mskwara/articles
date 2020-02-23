@@ -13,10 +13,10 @@
             <img v-if="image.length > 0" :src="image" class="mr-3 avatar" @click="goToUserInfo(article.article.userId)">
             <img v-else src="./assets/avatar.png" class="mr-3 avatar" @click="goToUserInfo(article.article.userId)">
           </div>
-          <div class="spinner-border text-primary" style="align-self: center ; margin-top: 10px" role="status" v-if="loadingAverageRating">
+          <div class="spinner-border text-primary" style="align-self: center ; margin-top: 10px" role="status" v-if="loadingAverageRating && !article.article.ratingDisabled">
             <span class="sr-only">Loading...</span>
           </div>
-          <div class="averageRating" v-if="articleRating != null && !loadingAverageRating">
+          <div class="averageRating" v-if="articleRating != null && !loadingAverageRating && article.article.ratingDisabled == 0">
             <h3 class="avg">{{averageRating}}</h3>
             <star-rating class="avgRating" :rating="parseFloat(averageRating)" :read-only="true" :increment="0.01" :star-size="20" :show-rating="false"
                :border-width="4" border-color="#d8d8d8" :rounded-corners="true"
@@ -45,7 +45,7 @@
           <div class="spinner-border text-primary" role="status" v-if="loadingRating && article.article.userId != getLoggedUserId()">
             <span class="sr-only">Loading...</span>
           </div>
-          <div class="bottom" v-if="!loadingRating">
+          <div class="bottom" v-if="!loadingRating && article.article.ratingDisabled == 0">
             <star-rating v-if="article.article.userId != getLoggedUserId()" class="rating" v-model="myRate.rating" @rating-selected="setRating"
               :star-size="30" :show-rating="false" :read-only="addingNewRating"
                :border-width="4" border-color="#d8d8d8" :rounded-corners="true"
