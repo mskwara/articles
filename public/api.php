@@ -1133,28 +1133,48 @@ $app->put('/api/users/update',
           die("Connection failed: " . $conn->connect_error);
       }
 
-      $email = $requestData['email'];
-      $description = $requestData['description'];
       $nick = $requestData['nick'];
-      $avatar = $requestData['avatar'];
-      $encryptedPass = password_hash($requestData['newPassword'], PASSWORD_DEFAULT);
-      if($requestData['newPassword'] != ""){
-        $sql = "UPDATE users SET email = \"$email\", description = \"$description\",
-         avatar = \"$avatar\", password = \"$encryptedPass\" WHERE nick = \"$nick\"";
+      $sqlVal = "SELECT nick, password FROM users WHERE nick = \"$nick\"";
+      $resultVal = $conn->query($sqlVal);
+
+      if ($resultVal->num_rows > 0) {
+          $row = $resultVal->fetch_assoc();
+          $hash = $row['password'];
+          $finish = password_verify($requestData['password'], $hash);
+
+      } else {
+          echo "0 results";
+      }
+      if($finish){
+        $email = $requestData['email'];
+        $description = $requestData['description'];
+        $nick = $requestData['nick'];
+        $avatar = $requestData['avatar'];
+        $encryptedPass = password_hash($requestData['newPassword'], PASSWORD_DEFAULT);
+        if($requestData['newPassword'] != ""){
+          $sql = "UPDATE users SET email = \"$email\", description = \"$description\",
+           avatar = \"$avatar\", password = \"$encryptedPass\" WHERE nick = \"$nick\"";
+        }
+        else {
+          $sql = "UPDATE users SET email = \"$email\", description = \"$description\", avatar = \"$avatar\" WHERE nick = \"$nick\"";
+        }
+  
+  
+        if ($conn->query($sql) === TRUE) {
+            $wynik = "true";
+            return $wynik;
+        } else {
+            echo "Error: " . $sql . "<br>" . $conn->error;
+        }
       }
       else {
-        $sql = "UPDATE users SET email = \"$email\", description = \"$description\", avatar = \"$avatar\" WHERE nick = \"$nick\"";
-      }
-
-
-      if ($conn->query($sql) === TRUE) {
-          echo "New record created successfully";
-      } else {
-          echo "Error: " . $sql . "<br>" . $conn->error;
+          $wynik = "false";
+          return $wynik;
       }
 
       $conn->close();
-      return $requestData;
+      $wynik = "true";
+      return $wynik;
   }
 
 );

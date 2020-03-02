@@ -163,21 +163,27 @@ export default {
     },
     update(){
       if(this.user.email != "" && this.password != ""){
-        this.$http.post('validateLogin', this.user).then(response => {
-          if(response.body == "true"){
-            this.$http.put('users/update', this.user);
-            this.user.password = "";
-            service.email = this.user.email;
-            service.description = this.user.description;
-            service.avatar = this.user.avatar;
-            this.user.password = "";
-            this.success = true;
-            EventBus.$emit('update-user');
-          }
-          else {
-            this.user.password = "";
-            this.failed = true;
-          }
+        //this.$http.post('validateLogin', this.user).then(response => {
+          //if(response.body == "true"){
+            this.$http.put('users/update', this.user).then(response => {
+              if(response.body == "true"){
+                this.user.password = "";
+                service.email = this.user.email;
+                service.description = this.user.description;
+                service.avatar = this.user.avatar;
+                this.user.password = "";
+                this.success = true;
+                EventBus.$emit('update-user');
+              }
+              else {
+                this.user.password = "";
+                this.failed = true;
+              }
+          //}
+          //else {
+          //  this.user.password = "";
+          //  this.failed = true;
+          //}
         });
       }
       else {

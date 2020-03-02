@@ -112,8 +112,10 @@ h6 {
 }
 .avatar {
   border-radius: 200px;
+  height: 200px;
   width: 200px;
-  min-width: 50px;
+  min-width: 200px;
+  min-height: 200px;
 }
 p {
   margin-left: 40px;
