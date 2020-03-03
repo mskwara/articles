@@ -228,13 +228,14 @@ $app->post('/api/article/delete',
             $commentsIds[] = $row['id'];
         }
     }
+    if(count($commentsIds) > 0){
+        $sql3 = 'DELETE FROM likes WHERE objId IN (' . implode(',', array_map('intval', $commentsIds)) . ')';
 
-    $sql3 = 'DELETE FROM likes WHERE objId IN (' . implode(',', array_map('intval', $commentsIds)) . ')';
-
-    if ($conn->query($sql3) === TRUE) {       //usuwanie lików
-        echo "Likes deleted successfully";
-    } else {
-        echo "Error: " . $sql3 . "<br>" . $conn->error;
+        if ($conn->query($sql3) === TRUE) {       //usuwanie lików
+            echo "Likes deleted successfully";
+        } else {
+            echo "Error: " . $sql3 . "<br>" . $conn->error;
+        }
     }
     
     $sql4 = "DELETE FROM comments WHERE articleId = $id";
@@ -1032,9 +1033,16 @@ $app->post('/api/articles/add',
           die("Connection failed: " . $conn->connect_error);
       }
 
-      $sql = "INSERT INTO articles (title, tag, style, content, bibliography, userId) VALUES('$requestData[title]', '$requestData[category]', '$requestData[style]', '$requestData[content]', '$requestData[bibliography]', '$requestData[userId]')";
+      $sql = "INSERT INTO articles (title, tag, style, content, bibliography, userId)
+       VALUES(?, '$requestData[category]', '$requestData[style]', ?, ?, '$requestData[userId]')";
 
-      if ($conn->query($sql) === TRUE) {
+
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param('sss', $requestData['title'], $requestData['content'], $requestData['bibliography']); // 's' specifies the variable type => 'string'
+
+        // $stmt->execute();
+
+      if ($stmt->execute() === TRUE) {
           echo "New record created successfully";
       } else {
           echo "Error: " . $sql . "<br>" . $conn->error;
@@ -1060,17 +1068,22 @@ $app->put('/api/article/edit',
       if ($conn->connect_error) {
           die("Connection failed: " . $conn->connect_error);
       }
-      $title = $requestData['title'];
+    //   $title = $requestData['title'];
       $tag = $requestData['tag'];
       $style = $requestData['style'];
-      $content = $requestData['content'];
-      $bibliography = $requestData['bibliography'];
+    //   $content = $requestData['content'];
+    //   $bibliography = $requestData['bibliography'];
       $id = $requestData['id'];
 
-      $sql = "UPDATE articles SET title = \"$title\", tag = \"$tag\",
-       style=\"$style\", content=\"$content\", bibliography=\"$bibliography\" WHERE id = $id";
+      $sql = "UPDATE articles SET title = ?, tag = \"$tag\",
+       style=\"$style\", content= ?, bibliography= ? WHERE id = $id";
 
-      if ($conn->query($sql) === TRUE) {
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param('sss', $requestData['title'], $requestData['content'], $requestData['bibliography']); // 's' specifies the variable type => 'string'
+
+        
+
+      if ($stmt->execute() === TRUE) {
           echo "New record created successfully";
       } else {
           echo "Error: " . $sql . "<br>" . $conn->error;
