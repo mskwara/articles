@@ -66,6 +66,16 @@ export default {
   },
   methods: {
     login() {
+      var specialChars = ["'", "\"", "/", "`", "[", "]", "{", "}", "\\", ":", "-"];
+      for(var i = 0 ; i < specialChars.length ; i++){
+        if(this.input.nick.includes(specialChars[i])){
+          this.failedText = "Nieprawidłowy znak w nicku!";
+          this.failed = true;
+          return;
+        }
+      }
+
+
       this.loading = true;
       if(this.input.nick != "" && this.input.password != "") {
         this.$http.post('validateLogin', this.input).then(response => {

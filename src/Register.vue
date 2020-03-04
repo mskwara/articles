@@ -34,7 +34,10 @@
 
         <div class="form-group">
           <input type="nick" class="form-control nickInput" placeholder="Nick" v-model="newUser.nick" aria-describedby="nickHelp">
-            <small id="nickHelp" class="form-text text-muted">Będzie Ci potrzeby do logowania</small>
+            <small id="nickHelp" class="form-text text-muted">
+              Będzie Ci potrzeby do logowania<br>
+              - Nie powinien zawierać znaków specjalnych
+            </small>
         </div>
         <div class="form-group">
           <input type="password" class="form-control" placeholder="Hasło" v-model="newUser.password">
@@ -162,8 +165,13 @@ export default {
       // const formData = new FormData()
       // formData.append('image', this.newUser.avatar, this.newUser.avatar.name)
       // axios.post('https://us-central1-oczymmyslisz-ad918.cloudfunctions.net/uploadFile ', formData)
-
-      
+      var specialChars = ["'", "\"", "/", "`", "[", "]", "{", "}", "\\", ":", "-"];
+      for(var i = 0 ; i < specialChars.length ; i++){
+        if(this.newUser.nick.includes(specialChars[i])){
+          this.failed = true;
+          return;
+        }
+      }
 
       if(this.newUser.name != "" && this.newUser.surname != ""
        && this.newUser.nick != "" && this.newUser.email != "" && this.newUser.password != ""){

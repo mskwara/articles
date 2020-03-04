@@ -338,11 +338,16 @@ export default {
     goToEditing(){
       this.$router.push({ name: 'editarticle', params: { article: this.article.article }});
     },
+    justifyArticle(){
+      this.article.article.content = "\t" + this.article.article.content;
+      this.article.article.content = this.article.article.content.replace(/\n/g,"\n\t");
+    }
   },
   mounted(){
     this.image = this.$route.params.image;
     this.$http.get('articles/'+this.$route.params.id).then(response => {
       this.article = response.body;
+      this.justifyArticle();
       this.myRate.articleId = this.article.article.id;
       this.getAverageRating();
       this.loadingArticle = false;
@@ -435,7 +440,7 @@ h6 {
 }
 p {
   margin-left: 20px;
-  white-space: pre-line;
+  white-space: pre-wrap;
   word-wrap: break-word;
   max-width: 800px;
   min-width: 500px;

@@ -664,6 +664,7 @@ $app->post('/api/validateLogin',
         $result = $conn->query($sql);
         $array = [];
 
+        $finish = false;
         if ($result->num_rows > 0) {
             // output data of each row
             $row = $result->fetch_assoc();
@@ -1040,7 +1041,6 @@ $app->post('/api/articles/add',
         $stmt = $conn->prepare($sql);
         $stmt->bind_param('sss', $requestData['title'], $requestData['content'], $requestData['bibliography']); // 's' specifies the variable type => 'string'
 
-        // $stmt->execute();
 
       if ($stmt->execute() === TRUE) {
           echo "New record created successfully";
@@ -1116,10 +1116,14 @@ $app->post('/api/users/add',
       $surname = ucwords($requestData['surname']);
 
       $sql = "INSERT INTO users (nick, name, surname, email, description, password, avatar)
-              VALUES('$requestData[nick]', \"$name\", \"$surname\",
-                 '$requestData[email]', '$requestData[description]', '$encryptedPass', '$requestData[avatar]')";
+              VALUES('$requestData[nick]', ?, ?,
+                 ?, ?, '$encryptedPass', '$requestData[avatar]')";
 
-      if ($conn->query($sql) === TRUE) {
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param('ssss', $name, $surname, $requestData['email'], $requestData['description']); // 's' specifies the variable type => 'string'
+
+
+      if ($stmt->execute() === TRUE) {
           echo "New record created successfully";
       } else {
           echo "Error: " . $sql . "<br>" . $conn->error;
@@ -1165,15 +1169,18 @@ $app->put('/api/users/update',
         $avatar = $requestData['avatar'];
         $encryptedPass = password_hash($requestData['newPassword'], PASSWORD_DEFAULT);
         if($requestData['newPassword'] != ""){
-          $sql = "UPDATE users SET email = \"$email\", description = \"$description\",
+          $sql = "UPDATE users SET email = ?, description = \"$description\",
            avatar = \"$avatar\", password = \"$encryptedPass\" WHERE nick = \"$nick\"";
         }
         else {
-          $sql = "UPDATE users SET email = \"$email\", description = \"$description\", avatar = \"$avatar\" WHERE nick = \"$nick\"";
+          $sql = "UPDATE users SET email = ?, description = ?, avatar = \"$avatar\" WHERE nick = \"$nick\"";
         }
+        
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param('ss', $email, $description); // 's' specifies the variable type => 'string'
+
   
-  
-        if ($conn->query($sql) === TRUE) {
+        if ($stmt->execute() === TRUE) {
             $wynik = "true";
             return $wynik;
         } else {
