@@ -18,7 +18,7 @@
              :border-width="4" border-color="#d8d8d8" :rounded-corners="true"
              :star-points="[23,2, 14,17, 0,19, 10,34, 7,50, 23,43, 38,50, 36,34, 46,19, 31,17]"></star-rating>
           <div class="topRight">
-            <a class="edit" v-if="article.userId == getCurrentLoggedUserId()" @click="goToEditing()">Edytuj</a>
+            <a class="edit" v-if="article.userId == getCurrentLoggedUserId() || isAdmin()" @click="goToEditing()">Edytuj</a>
             <h6>{{transformDate(article.date)}}</h6>
           </div>
         </div>
@@ -84,6 +84,12 @@ export default {
     },
     getCurrentLoggedUserId(){
       return service.id;
+    },
+    isAdmin(){
+      if(service.id == 47 && service.nick == "admin"){
+        return true;
+      }
+      return false;
     }
   },
 }

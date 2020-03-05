@@ -30,7 +30,7 @@
           <div class="header">
             <h2 class="mt-0">{{article.article.title}}</h2>
             <div class="topRight">
-              <a class="edit" v-if="article.article.userId == getLoggedUserId()" @click="goToEditing()">Edytuj</a>
+              <a class="edit" v-if="article.article.userId == getLoggedUserId() || isAdmin()" @click="goToEditing()">Edytuj</a>
               <h6>{{transformDate(article.article.date)}}</h6>
             </div>
           </div>
@@ -81,7 +81,7 @@
                     <img src="./assets/like.svg" @click="likeComment($event, comment)" :class="checkIfUserLikedAlready('comment',comment.id) ? 'likeDisabled' : 'likeEnabled'" />
                     <h5 class="numberOfLikes">{{comment.likes}}</h5>
                   </div>
-                  <div class="deleteComment" v-if="comment.userId == getLoggedUserId()">
+                  <div class="deleteComment" v-if="comment.userId == getLoggedUserId() || isAdmin()">
                     <img src="./assets/cancel.svg" @click="deleteComment($event, comment)" />
                   </div>
                 </div>
@@ -341,6 +341,12 @@ export default {
     justifyArticle(){
       this.article.article.content = "\t" + this.article.article.content;
       this.article.article.content = this.article.article.content.replace(/\n/g,"\n\t");
+    },
+    isAdmin(){
+      if(service.id == 47 && service.nick == "admin"){
+        return true;
+      }
+      return false;
     }
   },
   mounted(){
