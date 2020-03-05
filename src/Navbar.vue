@@ -21,6 +21,9 @@
             {{username}}
           </router-link>
         </li>
+        <li class="nav-item" v-if="isAdmin()">
+          <button class="btn btn-outline-info" @click="setRoute('adminpanel')">Panel admina</button>
+        </li>
         <li class="nav-item">
           <button class="btn btn-outline-success write" @click="setRoute('writing')">Napisz co myślisz</button>
         </li>
@@ -80,6 +83,12 @@ export default {
       this.onlyMyArticles = false;
       this.$router.push({ name: 'articles', params: { onlyMyArticles: this.onlyMyArticles }});
       EventBus.$emit('all-articles');
+    },
+    isAdmin(){
+      if(service.id == 47 && service.nick == "admin"){
+        return true;
+      }
+      return false;
     }
   },
   mounted(){

@@ -524,6 +524,36 @@ $app->get('/api/users/{nick}',
         return $response->withJson($array);
     }
 );
+$app->get('/api/users',
+    function (Request $request, Response $response, array $args) {
+        $servername = "serwer2001916.home.pl";
+        $username = "32213694_scoreboard";
+        $password = "Fell!Dell!=";
+        $dbname = "32213694_scoreboard";
+
+        // Create connection
+        $conn = new mysqli($servername, $username, $password, $dbname);
+        // Check connection
+        if ($conn->connect_error) {
+            die("Connection failed: " . $conn->connect_error);
+        }
+
+        $sql = "SELECT id, nick, name, surname, email FROM users";
+        $result = $conn->query($sql);
+        $array = [];
+
+        if ($result->num_rows > 0) {
+            // output data of each row
+            while($row = $result->fetch_assoc()) {
+                $array[] = $row;
+            }
+        } else {
+            echo "0 results";
+        }
+        $conn->close();
+        return $response->withJson($array);
+    }
+);
 $app->get('/api/users/info/{userId}',
     function (Request $request, Response $response, array $args) {
         $servername = "serwer2001916.home.pl";
@@ -893,6 +923,166 @@ $app->post('/api/comments/delete',
       } else {
           echo "Error: " . $sql1 . "<br>" . $conn->error;
       }
+
+      $conn->close();
+      return $requestData;
+  }
+
+);
+$app->post('/api/users/delete',
+     function (Request $request, Response $response, array $args) {
+
+      $servername = "serwer2001916.home.pl";
+      $username = "32213694_scoreboard";
+      $password = "Fell!Dell!=";
+      $dbname = "32213694_scoreboard";
+
+      $requestData = $request->getParsedBody();
+      // Create connection
+      $conn = new mysqli($servername, $username, $password, $dbname);
+      // Check connection
+      if ($conn->connect_error) {
+          die("Connection failed: " . $conn->connect_error);
+      }
+      $userId = $requestData['id'];
+      $sql = "DELETE FROM comments WHERE userId = $userId"; //usuwam jego komentarze
+
+      if ($conn->query($sql) === TRUE) {
+          echo "Comment deleted successfully";
+      } else {
+          echo "Error: " . $sql . "<br>" . $conn->error;
+      }
+      
+      $sql1 = "DELETE FROM likes WHERE userId = $userId";   //usuwam jego lajki
+
+      if ($conn->query($sql1) === TRUE) {
+          echo "Likes deleted successfully";
+      } else {
+          echo "Error: " . $sql1 . "<br>" . $conn->error;
+      }
+      
+      $sql10 = "SELECT articleId FROM rating WHERE userId = $userId";  //biore artykuły które on je ocenił
+        $result = $conn->query($sql10);
+        $articlesToChange = [];
+        $articlesToChangeNumber = $result->num_rows;
+
+        if ($articlesToChangeNumber > 0) {
+            // output data of each row
+            while($row = $result->fetch_assoc()) {
+                $articlesToChange[] = $row['articleId'];
+            }
+        }
+        
+
+      $sql2 = "DELETE FROM rating WHERE userId = $userId";   //usuwam jego ratingi
+
+      if ($conn->query($sql2) === TRUE) {
+          echo "Ratings deleted successfully";
+      } else {
+          echo "Error: " . $sql2 . "<br>" . $conn->error;
+      }
+
+      for($j = 0 ; $j < $articlesToChangeNumber ; $j = $j + 1){     //zmiana średnich ocen artykułów tam gdzie usunę jego ocenę
+          $artChId = $articlesToChange[$j];
+            $sql11 = "SELECT rating FROM rating WHERE articleId = $artChId";
+            $result = $conn->query($sql11);
+            $count = 0;
+            $avg = 0;
+
+            if ($result->num_rows > 0) {
+                // output data of each row
+                while($row = $result->fetch_assoc()) {
+                    $avg = $avg + $row['rating'];
+                    $count = $count + 1;
+                }
+            }
+            if($count > 0){
+                $wynik = round($avg/$count, 1);
+            }
+            else{
+                $wynik = 0;
+            }
+
+            $sql12 = "UPDATE articles SET rating = '$wynik' WHERE id = $artChId";
+
+            if ($conn->query($sql12) === TRUE) {
+                echo "Updated article rating";
+            } else {
+                echo "Error: " . $sql12 . "<br>" . $conn->error;
+            }
+        }
+
+      
+      $sql3 = "SELECT id FROM articles WHERE userId = $userId";   //biore wszystkie jego artykuły
+
+      $result = $conn->query($sql3);
+        $articles = [];
+        $numberOfArticles = $result->num_rows;
+        if ($numberOfArticles > 0) {
+            // output data of each row
+            while($row = $result->fetch_assoc()) {
+                $articles[] = $row['id'];
+            }
+        }
+
+      //USUWANIE WSZYSTKICH JEGO ARTYKUŁÓW -------------------------------------------------------------------------------------
+      echo "\r\nUsuwanie artykulow:\r\n";
+        for($i = 0 ; $i < $numberOfArticles ; $i = $i+1){
+            echo "\r\n";
+            $artId = $articles[$i];
+            $sql4 = "DELETE FROM articles WHERE id = $artId";
+
+            if ($conn->query($sql4) === TRUE) {        //usuwanie artykułu
+                echo "Article deleted successfully";
+            } else {
+                echo "Error: " . $sql4 . "<br>" . $conn->error;
+            }
+            
+            $sql5 = "DELETE FROM rating WHERE articleId = $artId";
+
+            if ($conn->query($sql5) === TRUE) {       //usuwanie ocen
+                echo "Rating deleted successfully";
+            } else {
+                echo "Error: " . $sql5 . "<br>" . $conn->error;
+            }
+            
+            $sql6 = "SELECT id FROM comments WHERE articleId = $artId";
+
+            $commentsIds = [];
+            $result = $conn->query($sql6);        //wzięcie id komentarzy
+            if ($result->num_rows > 0) {
+                while($row = $result->fetch_assoc()) {
+                    $commentsIds[] = $row['id'];
+                }
+            }
+            if(count($commentsIds) > 0){
+                $sql7 = 'DELETE FROM likes WHERE objId IN (' . implode(',', array_map('intval', $commentsIds)) . ')';
+
+                if ($conn->query($sql7) === TRUE) {       //usuwanie lików
+                    echo "Likes deleted successfully";
+                } else {
+                    echo "Error: " . $sql7 . "<br>" . $conn->error;
+                }
+            }
+            
+            $sql8 = "DELETE FROM comments WHERE articleId = $artId";
+
+            if ($conn->query($sql8) === TRUE) {       //usuwanie lików
+                echo "Comments deleted successfully";
+            } else {
+                echo "Error: " . $sql8 . "<br>" . $conn->error;
+            }
+        }
+    //KONIEC USUWANIA WSZYSTKICH JEGO ARTYKUŁÓW --------------------------------------------------------------------------------------
+
+    $sql9 = "DELETE FROM users WHERE id = $userId";   //usuwam jego lajki
+
+      if ($conn->query($sql9) === TRUE) {
+          echo "User deleted successfully";
+      } else {
+          echo "Error: " . $sql9 . "<br>" . $conn->error;
+      }
+
 
       $conn->close();
       return $requestData;
