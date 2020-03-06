@@ -1418,20 +1418,21 @@ $app->put('/api/users/update',
       if($finish){
         $email = $requestData['email'];
         $name = $requestData['name'];
+        $surname = $requestData['surname'];
         $description = $requestData['description'];
         $nick = $requestData['nick'];
         $avatar = $requestData['avatar'];
         $encryptedPass = password_hash($requestData['newPassword'], PASSWORD_DEFAULT);
         if($requestData['newPassword'] != ""){
-          $sql = "UPDATE users SET name = ?, email = ?, description = \"$description\",
+          $sql = "UPDATE users SET name = ?, surname = ?, email = ?, description = \"$description\",
            avatar = \"$avatar\", password = \"$encryptedPass\" WHERE nick = \"$nick\"";
         }
         else {
-          $sql = "UPDATE users SET name = ?, email = ?, description = ?, avatar = \"$avatar\" WHERE nick = \"$nick\"";
+          $sql = "UPDATE users SET name = ?, surname = ?, email = ?, description = ?, avatar = \"$avatar\" WHERE nick = \"$nick\"";
         }
         
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param('sss', $name, $email, $description); // 's' specifies the variable type => 'string'
+        $stmt->bind_param('ssss', $name, $surname, $email, $description); // 's' specifies the variable type => 'string'
 
   
         if ($stmt->execute() === TRUE) {

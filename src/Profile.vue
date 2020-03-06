@@ -10,7 +10,7 @@
             <input type="text" class="form-control" placeholder="Imię" v-model="user.name">
           </div>
           <div class="col">
-            <input type="text" class="form-control" placeholder="Nazwisko" v-model="user.surname" disabled>
+            <input type="text" class="form-control" placeholder="Nazwisko" v-model="user.surname">
           </div>
         </div>
         <div class="form-group">
@@ -162,15 +162,15 @@ export default {
 
     },
     update(){
-      if(this.user.email != "" && this.password != "" && this.user.name != ""){
-        //this.$http.post('validateLogin', this.user).then(response => {
-          //if(response.body == "true"){
+      if(this.user.email != "" && this.password != "" && this.user.name != "" && this.user.surname != ""){
             this.$http.put('users/update', this.user).then(response => {
               if(response.body == "true"){
                 this.user.password = "";
                 service.email = this.user.email;
                 service.description = this.user.description;
                 service.avatar = this.user.avatar;
+                service.name = this.user.name;
+                service.surname = this.user.surname;
                 this.user.password = "";
                 this.success = true;
                 EventBus.$emit('update-user');
@@ -179,11 +179,6 @@ export default {
                 this.user.password = "";
                 this.failed = true;
               }
-          //}
-          //else {
-          //  this.user.password = "";
-          //  this.failed = true;
-          //}
         });
       }
       else {
