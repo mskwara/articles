@@ -1,13 +1,27 @@
 <template>
 <div id="adminpanel">
-  <ul class="list-group" :key="user.id" v-for="user in users">
-    <li class="list-group-item">
-      <span>{{user.id}}. <b>{{user.name}} {{user.surname}}</b>, <i>{{user.email}}</i></span>
-      <button type="button" class="btn btn-outline-danger delete" @click="deleteUser(user)">Usuń</button>
-    </li>
-  </ul>
+  <div class="panel">
+    <ul class="list-group" :key="user.id" v-for="user in users">
+      <li class="list-group-item" v-if="user.id != 47 && user.nick != 'admin'">
+        <span>{{user.id}}. <b>{{user.name}} {{user.surname}}</b>, <i>{{user.email}}</i></span>
+        <button type="button" class="btn btn-outline-danger delete" @click="deletingUser(user)">Usuń</button>
+      </li>
+    </ul>
+  </div>
+  <div class="panel">
+    <textarea class="form-control" rows="3" v-model="readyToCopy"></textarea>
+    <button type="button" class="btn btn-outline-primary" @click="getAllEmails()">Wszystkie emaile</button>
+  </div>
 
+  <md-dialog-confirm
+      :md-active.sync="deleting"
+      md-title="Jesteś pewien?"
+      :md-content="deletingText"
+      md-cancel-text="Anuluj"
+      md-confirm-text="Zatwierdź"
+      @md-confirm="deleteUser" />
 </div>
+
 </template>
 
 <script>
@@ -20,6 +34,10 @@ export default {
   data(){
     return {
       users: [],
+      readyToCopy: "",
+      userToDelete: [],
+      deleting: false,
+      deletingText: ""
     }
   },
   mounted(){
@@ -34,9 +52,27 @@ export default {
         this.users = response.body;
       });
     },
-    deleteUser(user){
-      this.$http.post('users/delete', user).then(()=>{
+    deletingUser(user){
+      this.userToDelete = user;
+      this.deletingText = "Jeśli zatwierdzisz, usuniemy użytkownika "+this.userToDelete.name+" "+this.userToDelete.surname+".";
+      this.deleting = true;
+    },
+    deleteUser(){   
+      this.$http.post('users/delete', this.userToDelete).then(()=>{
         this.getUsers();
+      });
+    },
+    getAllEmails(){
+      this.$http.get('emails/all').then(response => {
+        var array = response.body;
+        var text = "";
+        for(var i = 0 ; i < array.length ; i = i + 1){
+          if(array[i].id != 47){
+            text += array[i].email;
+            text += ", ";
+          }
+        }
+        this.readyToCopy = text;
       });
     }
   },
@@ -47,10 +83,16 @@ export default {
 #adminpanel {
   text-align: center;
   display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+.panel {
+  display: flex;
   flex-direction: column;
+  width: 48%
 }
 .list-group-item {
-  width: 50%;
+  width: 100%;
   text-align: left;
   display: flex;
   flex-direction: row;
@@ -63,6 +105,9 @@ span {
   display: flex;
   align-items: center;
   white-space: pre;
+}
+textarea {
+  margin-bottom: 20px;
 }
 @keyframes animationPop {
   from {opacity: 0}

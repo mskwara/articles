@@ -707,12 +707,18 @@ $app->post('/api/validateLogin',
         } else {
             echo "0 results";
         }
-        $conn->close();
+        
         if($finish){
+            $date = date('Y-m-d H:i:s');
+            $sql2 = "UPDATE users SET lastLogin = \"$date\" WHERE nick = \"$nick\"";
+            $conn->query($sql2);
+
+            $conn->close();
             $wynik = "true";
             return $wynik;
         }
         else {
+            $conn->close();
             $wynik = "false";
             return $wynik;
         }
@@ -1503,6 +1509,36 @@ $app->put('/api/comments/{id}/decrementLikes',
       return $requestData;
   }
 
+);
+$app->get('/api/emails/all',
+    function (Request $request, Response $response, array $args) {
+        $servername = "serwer2001916.home.pl";
+        $username = "32213694_scoreboard";
+        $password = "Fell!Dell!=";
+        $dbname = "32213694_scoreboard";
+
+        // Create connection
+        $conn = new mysqli($servername, $username, $password, $dbname);
+        // Check connection
+        if ($conn->connect_error) {
+            die("Connection failed: " . $conn->connect_error);
+        }
+
+        $sql = "SELECT id, email FROM users";
+        $result = $conn->query($sql);
+        $array = [];
+
+        if ($result->num_rows > 0) {
+            // output data of each row
+            while($row = $result->fetch_assoc()) {
+                $array[] = $row;
+            }
+        } else {
+            echo "0 results";
+        }
+        $conn->close();
+        return $response->withJson($array);
+    }
 );
 
 $app->run();
