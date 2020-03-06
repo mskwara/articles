@@ -7,7 +7,7 @@
       <form v-on:submit.prevent="applying = true">
         <div class="form-row">
           <div class="col">
-            <input type="text" class="form-control" placeholder="Imię" v-model="user.name" disabled>
+            <input type="text" class="form-control" placeholder="Imię" v-model="user.name">
           </div>
           <div class="col">
             <input type="text" class="form-control" placeholder="Nazwisko" v-model="user.surname" disabled>
@@ -162,7 +162,7 @@ export default {
 
     },
     update(){
-      if(this.user.email != "" && this.password != ""){
+      if(this.user.email != "" && this.password != "" && this.user.name != ""){
         //this.$http.post('validateLogin', this.user).then(response => {
           //if(response.body == "true"){
             this.$http.put('users/update', this.user).then(response => {
