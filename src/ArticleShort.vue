@@ -26,9 +26,11 @@
         <div class="bottom">
           <button type="button" class="btn btn-success" @click="goToArticle(article.id)">Czytaj dalej</button>
 
-          <div class="comment" v-if="article.commentsNumber > 0">
-            <img src="./assets/comment.svg" />
-          </div>
+          <transition name="fade">
+            <div class="comment" v-if="commentsTotal > 0">
+              <img src="./assets/comment.svg" />
+            </div>
+          </transition>
         </div>
       </div>
     </div>
@@ -49,6 +51,7 @@ export default {
     return {
       image: "",
       loadingImage: true,
+      commentsTotal: 0
     }
   },
   mounted(){
@@ -62,6 +65,10 @@ export default {
       this.image = service.avatar;
       this.loadingImage = false;
     }
+    this.$http.get('articles/'+this.article.id+'/comments/number').then(response => {
+        this.commentsTotal = response.body[0].total;
+      });
+    
   },
   methods: {
     goToArticle(id){

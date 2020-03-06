@@ -68,13 +68,13 @@
               <transition-group name="fade">
               <li class="list-group-item" :key="comment.id" v-for="comment in comments">
                 <div class="avatarWithTooltip">
-                  <img v-if="getCommentImage(comment.userId).length > 0" :src="getCommentImage(comment.userId)" class="mr-3 commentAvatar">
-                  <img v-else src="./assets/avatar.png" class="mr-3 commentAvatar">
+                  <img v-if="getCommentImage(comment.userId).length > 0" :src="getCommentImage(comment.userId)" class="mr-3 commentAvatar" @click="goToUserInfo(comment.userId)">
+                  <img v-else src="./assets/avatar.png" class="mr-3 commentAvatar" @click="goToUserInfo(comment.userId)">
                   <md-tooltip md-direction="left">{{transformDate(comment.date)}}</md-tooltip>
                 </div>
                 <div class="comContent">
                   <h6 class="inCommentH6">
-                    <a class="username" @click="goToUserInfo(comment.userId)">{{comment.userName}} {{comment.userSurname}}</a>
+                    <a class="username" @click="goToUserInfo(comment.userId)">{{getCommentPersonData(comment.userId)}}</a>
                     {{comment.content}}
                   </h6>
                   <div class="likeIconComments">
@@ -161,6 +161,7 @@ export default {
       isBibliographyVisible: false,
       addingNewRating: false,
       togglingLike: false,
+      commentsUserData: []
     }
   },
   methods: {
@@ -173,7 +174,6 @@ export default {
       this.$http.post('comments/add', this.newComment);
       this.newComment.content = "";
       this.getComments();
-      this.$http.put('articles/'+this.$route.params.id+'/commentsNumber');
     },
     getComments(){
       this.$http.get('articles/'+this.$route.params.id+'/comments').then(response => {
@@ -198,6 +198,9 @@ export default {
         }
         this.$http.post('users/avatars-needed', obj).then(response => {
           this.commentsAvatars = response.body;
+        });
+        this.$http.post('users/user-short-data-needed', obj).then(response => {
+          this.commentsUserData = response.body;
         });
         if(this.loadingComments == true){
           this.loadingComments = false;
@@ -320,6 +323,14 @@ export default {
       }
       return "";
     },
+    getCommentPersonData(userId){
+      for(var i = 0 ; i < this.commentsUserData.length ; i++){
+        if(this.commentsUserData[i].id == userId){
+          return this.commentsUserData[i].name+" "+this.commentsUserData[i].surname;
+        }
+      }
+      return "";
+    },
     getLoggedUserId(){
       return service.id;
     },
@@ -347,7 +358,7 @@ export default {
         return true;
       }
       return false;
-    }
+    },
   },
   mounted(){
     this.image = this.$route.params.image;

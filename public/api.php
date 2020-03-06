@@ -675,6 +675,37 @@ $app->post('/api/users/avatars-needed',
         return $response->withJson($array);
     }
 );
+$app->post('/api/users/user-short-data-needed',
+    function (Request $request, Response $response, array $args) {
+        $servername = "serwer2001916.home.pl";
+        $username = "32213694_scoreboard";
+        $password = "Fell!Dell!=";
+        $dbname = "32213694_scoreboard";
+
+        // Create connection
+        $conn = new mysqli($servername, $username, $password, $dbname);
+        // Check connection
+        if ($conn->connect_error) {
+            die("Connection failed: " . $conn->connect_error);
+        }
+        $requestData = $request->getParsedBody();
+        $userIds = $requestData['userIds'];
+        $sql = 'SELECT id, name, surname FROM users WHERE id IN (' . implode(',', array_map('intval', $userIds)) . ')';
+        $result = $conn->query($sql);
+        $array = [];
+
+        if ($result->num_rows > 0) {
+            // output data of each row
+            while($row = $result->fetch_assoc()) {
+                $array[] = $row;
+            }
+        } else {
+            echo "0 results";
+        }
+        $conn->close();
+        return $response->withJson($array);
+    }
+);
 $app->post('/api/validateLogin',
     function (Request $request, Response $response, array $args) {
         $servername = "serwer2001916.home.pl";
@@ -838,6 +869,32 @@ $app->get('/api/articles/{id}/comments',
         return $response->withJson($array);
     }
 );
+$app->get('/api/articles/{id}/comments/number',
+    function (Request $request, Response $response, array $args) {
+        $servername = "serwer2001916.home.pl";
+        $username = "32213694_scoreboard";
+        $password = "Fell!Dell!=";
+        $dbname = "32213694_scoreboard";
+
+        // Create connection
+        $conn = new mysqli($servername, $username, $password, $dbname);
+        // Check connection
+        if ($conn->connect_error) {
+            die("Connection failed: " . $conn->connect_error);
+        }
+        $id = $args['id'];
+        $sql = "SELECT count(id) as total FROM comments WHERE articleId = $id";
+        $result = $conn->query($sql);
+        $array = [];
+
+        while($row = $result->fetch_assoc()) {
+            $array[] = $row;
+        }
+
+        $conn->close();
+        return $response->withJson($array);
+    }
+);
 $app->get('/api/users/{id}/likes',
     function (Request $request, Response $response, array $args) {
         $servername = "serwer2001916.home.pl";
@@ -885,7 +942,7 @@ $app->post('/api/comments/add',
           die("Connection failed: " . $conn->connect_error);
       }
 
-      $sql = "INSERT INTO comments (articleId, content, userId, userName, userSurname) VALUES('$requestData[articleId]', '$requestData[content]', '$requestData[userId]', '$requestData[userName]', '$requestData[userSurname]')";
+      $sql = "INSERT INTO comments (articleId, content, userId) VALUES('$requestData[articleId]', '$requestData[content]', '$requestData[userId]')";
 
       if ($conn->query($sql) === TRUE) {
           echo "New record created successfully";
@@ -1392,35 +1449,6 @@ $app->put('/api/users/update',
       $conn->close();
       $wynik = "true";
       return $wynik;
-  }
-
-);
-$app->put('/api/articles/{id}/commentsNumber',
-     function (Request $request, Response $response, array $args) {
-
-      $servername = "serwer2001916.home.pl";
-      $username = "32213694_scoreboard";
-      $password = "Fell!Dell!=";
-      $dbname = "32213694_scoreboard";
-
-      $requestData = $request->getParsedBody();
-      // Create connection
-      $conn = new mysqli($servername, $username, $password, $dbname);
-      // Check connection
-      if ($conn->connect_error) {
-          die("Connection failed: " . $conn->connect_error);
-      }
-      $id = $args['id'];
-      $sql = "UPDATE articles SET commentsNumber=commentsNumber+1 WHERE id=$id";
-
-      if ($conn->query($sql) === TRUE) {
-          echo "New record created successfully";
-      } else {
-          echo "Error: " . $sql . "<br>" . $conn->error;
-      }
-
-      $conn->close();
-      return $requestData;
   }
 
 );
