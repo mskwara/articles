@@ -97,6 +97,7 @@ export default {
 
     EventBus.$on('update-user', () => {
       this.image = service.avatar;
+      this.username = service.name;
     });
   }
 }
