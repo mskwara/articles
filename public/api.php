@@ -1570,5 +1570,35 @@ $app->get('/api/emails/all',
         return $response->withJson($array);
     }
 );
+$app->get('/api/emails/sleeping',
+    function (Request $request, Response $response, array $args) {
+        $servername = "serwer2001916.home.pl";
+        $username = "32213694_scoreboard";
+        $password = "Fell!Dell!=";
+        $dbname = "32213694_scoreboard";
+
+        // Create connection
+        $conn = new mysqli($servername, $username, $password, $dbname);
+        // Check connection
+        if ($conn->connect_error) {
+            die("Connection failed: " . $conn->connect_error);
+        }
+
+        $sql = "SELECT id, email FROM users WHERE TO_DAYS(LEFT(lastLogin , 10)) - TO_DAYS(CURDATE()) >= 5 OR lastLogin IS NULL";
+        $result = $conn->query($sql);
+        $array = [];
+
+        if ($result->num_rows > 0) {
+            // output data of each row
+            while($row = $result->fetch_assoc()) {
+                $array[] = $row;
+            }
+        } else {
+            echo "0 results";
+        }
+        $conn->close();
+        return $response->withJson($array);
+    }
+);
 
 $app->run();

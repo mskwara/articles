@@ -10,7 +10,8 @@
   </div>
   <div class="panel">
     <textarea class="form-control" rows="3" v-model="readyToCopy"></textarea>
-    <button type="button" class="btn btn-outline-primary" @click="getAllEmails()">Wszystkie emaile</button>
+    <button type="button" class="btn btn-outline-primary mailbtn" @click="getAllEmails()">Wszystkie emaile</button>
+    <button type="button" class="btn btn-outline-primary" @click="getSleepingEmails()">Nieaktywni</button>
   </div>
 
   <md-dialog-confirm
@@ -74,6 +75,19 @@ export default {
         }
         this.readyToCopy = text;
       });
+    },
+    getSleepingEmails(){
+      this.$http.get('emails/sleeping').then(response => {
+        var array = response.body;
+        var text = "";
+        for(var i = 0 ; i < array.length ; i = i + 1){
+          if(array[i].id != 47){
+            text += array[i].email;
+            text += ", ";
+          }
+        }
+        this.readyToCopy = text;
+      });
     }
   },
 }
@@ -107,6 +121,9 @@ span {
   white-space: pre;
 }
 textarea {
+  margin-bottom: 20px;
+}
+.mailbtn {
   margin-bottom: 20px;
 }
 @keyframes animationPop {
