@@ -21,3 +21,4 @@ yarn-error.log*
 *.sw?
 
 /vendor/
+src/articlesworkspace.code-workspace
