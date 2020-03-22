@@ -10,7 +10,7 @@ $app->get('/api/articles/count',
     function (Request $request, Response $response, array $args) {
         $servername = "serwer2001916.home.pl";
         $username = "32213694_scoreboard";
-        $password = "Fell!Dell!=";
+        $password = "passwordscoreboard";
         $dbname = "32213694_scoreboard";
         // Create connection
         $conn = new mysqli($servername, $username, $password, $dbname);
@@ -39,7 +39,7 @@ $app->post('/api/articles/maxPage',
     function (Request $request, Response $response, array $args) {
         $servername = "serwer2001916.home.pl";
         $username = "32213694_scoreboard";
-        $password = "Fell!Dell!=";
+        $password = "passwordscoreboard";
         $dbname = "32213694_scoreboard";
 
         $requestData = $request->getParsedBody();
@@ -115,7 +115,7 @@ $app->post('/api/articles',
     function (Request $request, Response $response, array $args) {
         $servername = "serwer2001916.home.pl";
         $username = "32213694_scoreboard";
-        $password = "Fell!Dell!=";
+        $password = "passwordscoreboard";
         $dbname = "32213694_scoreboard";
 
         $requestData = $request->getParsedBody();
@@ -191,7 +191,7 @@ $app->post('/api/article/delete',
 
     $servername = "serwer2001916.home.pl";
     $username = "32213694_scoreboard";
-    $password = "Fell!Dell!=";
+    $password = "passwordscoreboard";
     $dbname = "32213694_scoreboard";
 
     $requestData = $request->getParsedBody();
@@ -255,7 +255,7 @@ $app->get('/api/articles/{articleId}/rating/user/{userId}',
     function (Request $request, Response $response, array $args) {
         $servername = "serwer2001916.home.pl";
         $username = "32213694_scoreboard";
-        $password = "Fell!Dell!=";
+        $password = "passwordscoreboard";
         $dbname = "32213694_scoreboard";
         // Create connection
         $conn = new mysqli($servername, $username, $password, $dbname);
@@ -285,7 +285,7 @@ $app->get('/api/articles/{articleId}/averageRating',
     function (Request $request, Response $response, array $args) {
         $servername = "serwer2001916.home.pl";
         $username = "32213694_scoreboard";
-        $password = "Fell!Dell!=";
+        $password = "passwordscoreboard";
         $dbname = "32213694_scoreboard";
         // Create connection
         $conn = new mysqli($servername, $username, $password, $dbname);
@@ -323,7 +323,7 @@ $app->get('/api/users/{userId}/articles/statistics',
     function (Request $request, Response $response, array $args) {
         $servername = "serwer2001916.home.pl";
         $username = "32213694_scoreboard";
-        $password = "Fell!Dell!=";
+        $password = "passwordscoreboard";
         $dbname = "32213694_scoreboard";
         // Create connection
         $conn = new mysqli($servername, $username, $password, $dbname);
@@ -427,7 +427,7 @@ $app->get('/api/articles/search/{phrase}',
     function (Request $request, Response $response, array $args) {
         $servername = "serwer2001916.home.pl";
         $username = "32213694_scoreboard";
-        $password = "Fell!Dell!=";
+        $password = "passwordscoreboard";
         $dbname = "32213694_scoreboard";
         // Create connection
         $conn = new mysqli($servername, $username, $password, $dbname);
@@ -458,7 +458,7 @@ $app->get('/api/articles/{id}',
     function (Request $request, Response $response, array $args) {
         $servername = "serwer2001916.home.pl";
         $username = "32213694_scoreboard";
-        $password = "Fell!Dell!=";
+        $password = "passwordscoreboard";
         $dbname = "32213694_scoreboard";
 
         // Create connection
@@ -498,7 +498,7 @@ $app->get('/api/users/{nick}',
     function (Request $request, Response $response, array $args) {
         $servername = "serwer2001916.home.pl";
         $username = "32213694_scoreboard";
-        $password = "Fell!Dell!=";
+        $password = "passwordscoreboard";
         $dbname = "32213694_scoreboard";
 
         // Create connection
@@ -528,7 +528,7 @@ $app->get('/api/users',
     function (Request $request, Response $response, array $args) {
         $servername = "serwer2001916.home.pl";
         $username = "32213694_scoreboard";
-        $password = "Fell!Dell!=";
+        $password = "passwordscoreboard";
         $dbname = "32213694_scoreboard";
 
         // Create connection
@@ -558,7 +558,7 @@ $app->get('/api/users/info/{userId}',
     function (Request $request, Response $response, array $args) {
         $servername = "serwer2001916.home.pl";
         $username = "32213694_scoreboard";
-        $password = "Fell!Dell!=";
+        $password = "passwordscoreboard";
         $dbname = "32213694_scoreboard";
 
         // Create connection
@@ -588,7 +588,7 @@ $app->get('/api/users/short/{id}',
     function (Request $request, Response $response, array $args) {
         $servername = "serwer2001916.home.pl";
         $username = "32213694_scoreboard";
-        $password = "Fell!Dell!=";
+        $password = "passwordscoreboard";
         $dbname = "32213694_scoreboard";
 
         // Create connection
@@ -618,7 +618,7 @@ $app->get('/api/users/{id}/avatar',
     function (Request $request, Response $response, array $args) {
         $servername = "serwer2001916.home.pl";
         $username = "32213694_scoreboard";
-        $password = "Fell!Dell!=";
+        $password = "passwordscoreboard";
         $dbname = "32213694_scoreboard";
 
         // Create connection
@@ -648,7 +648,7 @@ $app->post('/api/users/avatars-needed',
     function (Request $request, Response $response, array $args) {
         $servername = "serwer2001916.home.pl";
         $username = "32213694_scoreboard";
-        $password = "Fell!Dell!=";
+        $password = "passwordscoreboard";
         $dbname = "32213694_scoreboard";
 
         // Create connection
@@ -679,7 +679,7 @@ $app->post('/api/users/user-short-data-needed',
     function (Request $request, Response $response, array $args) {
         $servername = "serwer2001916.home.pl";
         $username = "32213694_scoreboard";
-        $password = "Fell!Dell!=";
+        $password = "passwordscoreboard";
         $dbname = "32213694_scoreboard";
 
         // Create connection
@@ -710,7 +710,7 @@ $app->post('/api/validateLogin',
     function (Request $request, Response $response, array $args) {
         $servername = "serwer2001916.home.pl";
         $username = "32213694_scoreboard";
-        $password = "Fell!Dell!=";
+        $password = "passwordscoreboard";
         $dbname = "32213694_scoreboard";
 
         $requestData = $request->getParsedBody();
@@ -777,7 +777,7 @@ $app->post('/api/validateUniqueNick',
     function (Request $request, Response $response, array $args) {
         $servername = "serwer2001916.home.pl";
         $username = "32213694_scoreboard";
-        $password = "Fell!Dell!=";
+        $password = "passwordscoreboard";
         $dbname = "32213694_scoreboard";
 
         $requestData = $request->getParsedBody();
@@ -810,7 +810,7 @@ $app->post('/api/validateIfUserExists',
     function (Request $request, Response $response, array $args) {
         $servername = "serwer2001916.home.pl";
         $username = "32213694_scoreboard";
-        $password = "Fell!Dell!=";
+        $password = "passwordscoreboard";
         $dbname = "32213694_scoreboard";
 
         $requestData = $request->getParsedBody();
@@ -843,7 +843,7 @@ $app->get('/api/articles/{id}/comments',
     function (Request $request, Response $response, array $args) {
         $servername = "serwer2001916.home.pl";
         $username = "32213694_scoreboard";
-        $password = "Fell!Dell!=";
+        $password = "passwordscoreboard";
         $dbname = "32213694_scoreboard";
 
         // Create connection
@@ -873,7 +873,7 @@ $app->get('/api/articles/{id}/comments/number',
     function (Request $request, Response $response, array $args) {
         $servername = "serwer2001916.home.pl";
         $username = "32213694_scoreboard";
-        $password = "Fell!Dell!=";
+        $password = "passwordscoreboard";
         $dbname = "32213694_scoreboard";
 
         // Create connection
@@ -899,7 +899,7 @@ $app->get('/api/users/{id}/likes',
     function (Request $request, Response $response, array $args) {
         $servername = "serwer2001916.home.pl";
         $username = "32213694_scoreboard";
-        $password = "Fell!Dell!=";
+        $password = "passwordscoreboard";
         $dbname = "32213694_scoreboard";
 
         // Create connection
@@ -931,7 +931,7 @@ $app->post('/api/comments/add',
 
       $servername = "serwer2001916.home.pl";
       $username = "32213694_scoreboard";
-      $password = "Fell!Dell!=";
+      $password = "passwordscoreboard";
       $dbname = "32213694_scoreboard";
 
       $requestData = $request->getParsedBody();
@@ -960,7 +960,7 @@ $app->post('/api/comments/delete',
 
       $servername = "serwer2001916.home.pl";
       $username = "32213694_scoreboard";
-      $password = "Fell!Dell!=";
+      $password = "passwordscoreboard";
       $dbname = "32213694_scoreboard";
 
       $requestData = $request->getParsedBody();
@@ -997,7 +997,7 @@ $app->post('/api/users/delete',
 
       $servername = "serwer2001916.home.pl";
       $username = "32213694_scoreboard";
-      $password = "Fell!Dell!=";
+      $password = "passwordscoreboard";
       $dbname = "32213694_scoreboard";
 
       $requestData = $request->getParsedBody();
@@ -1157,7 +1157,7 @@ $app->post('/api/likes/add',
 
       $servername = "serwer2001916.home.pl";
       $username = "32213694_scoreboard";
-      $password = "Fell!Dell!=";
+      $password = "passwordscoreboard";
       $dbname = "32213694_scoreboard";
 
       $requestData = $request->getParsedBody();
@@ -1186,7 +1186,7 @@ $app->post('/api/rating/add',
 
       $servername = "serwer2001916.home.pl";
       $username = "32213694_scoreboard";
-      $password = "Fell!Dell!=";
+      $password = "passwordscoreboard";
       $dbname = "32213694_scoreboard";
 
       $requestData = $request->getParsedBody();
@@ -1215,7 +1215,7 @@ $app->put('/api/rating/update',
 
       $servername = "serwer2001916.home.pl";
       $username = "32213694_scoreboard";
-      $password = "Fell!Dell!=";
+      $password = "passwordscoreboard";
       $dbname = "32213694_scoreboard";
 
       $requestData = $request->getParsedBody();
@@ -1244,7 +1244,7 @@ $app->post('/api/likes/delete',
 
       $servername = "serwer2001916.home.pl";
       $username = "32213694_scoreboard";
-      $password = "Fell!Dell!=";
+      $password = "passwordscoreboard";
       $dbname = "32213694_scoreboard";
 
       $requestData = $request->getParsedBody();
@@ -1276,7 +1276,7 @@ $app->post('/api/articles/add',
 
       $servername = "serwer2001916.home.pl";
       $username = "32213694_scoreboard";
-      $password = "Fell!Dell!=";
+      $password = "passwordscoreboard";
       $dbname = "32213694_scoreboard";
 
       $requestData = $request->getParsedBody();
@@ -1311,7 +1311,7 @@ $app->put('/api/article/edit',
 
       $servername = "serwer2001916.home.pl";
       $username = "32213694_scoreboard";
-      $password = "Fell!Dell!=";
+      $password = "passwordscoreboard";
       $dbname = "32213694_scoreboard";
 
       $requestData = $request->getParsedBody();
@@ -1352,7 +1352,7 @@ $app->post('/api/users/add',
 
       $servername = "serwer2001916.home.pl";
       $username = "32213694_scoreboard";
-      $password = "Fell!Dell!=";
+      $password = "passwordscoreboard";
       $dbname = "32213694_scoreboard";
 
       $requestData = $request->getParsedBody();
@@ -1392,7 +1392,7 @@ $app->put('/api/users/update',
 
       $servername = "serwer2001916.home.pl";
       $username = "32213694_scoreboard";
-      $password = "Fell!Dell!=";
+      $password = "passwordscoreboard";
       $dbname = "32213694_scoreboard";
 
       $requestData = $request->getParsedBody();
@@ -1458,7 +1458,7 @@ $app->put('/api/articles/{id}/rating',
 
       $servername = "serwer2001916.home.pl";
       $username = "32213694_scoreboard";
-      $password = "Fell!Dell!=";
+      $password = "passwordscoreboard";
       $dbname = "32213694_scoreboard";
 
       $requestData = $request->getParsedBody();
@@ -1487,7 +1487,7 @@ $app->put('/api/comments/{id}/incrementLikes',
 
       $servername = "serwer2001916.home.pl";
       $username = "32213694_scoreboard";
-      $password = "Fell!Dell!=";
+      $password = "passwordscoreboard";
       $dbname = "32213694_scoreboard";
 
       $requestData = $request->getParsedBody();
@@ -1516,7 +1516,7 @@ $app->put('/api/comments/{id}/decrementLikes',
 
       $servername = "serwer2001916.home.pl";
       $username = "32213694_scoreboard";
-      $password = "Fell!Dell!=";
+      $password = "passwordscoreboard";
       $dbname = "32213694_scoreboard";
 
       $requestData = $request->getParsedBody();
@@ -1544,7 +1544,7 @@ $app->get('/api/emails/all',
     function (Request $request, Response $response, array $args) {
         $servername = "serwer2001916.home.pl";
         $username = "32213694_scoreboard";
-        $password = "Fell!Dell!=";
+        $password = "passwordscoreboard";
         $dbname = "32213694_scoreboard";
 
         // Create connection
@@ -1574,7 +1574,7 @@ $app->get('/api/emails/sleeping',
     function (Request $request, Response $response, array $args) {
         $servername = "serwer2001916.home.pl";
         $username = "32213694_scoreboard";
-        $password = "Fell!Dell!=";
+        $password = "passwordscoreboard";
         $dbname = "32213694_scoreboard";
 
         // Create connection
